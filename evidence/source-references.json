@@ -1,0 +1,58 @@
+[
+  {
+    "name": "clock-cpu-8996.c",
+    "path": "drivers/clk/msm/clock-cpu-8996.c",
+    "commit": "4075955d5b36f402a0f43ae01b708ae4705ce484",
+    "url": "https://raw.githubusercontent.com/LineageOS/android_kernel_google_marlin/4075955d5b36f402a0f43ae01b708ae4705ce484/drivers/clk/msm/clock-cpu-8996.c",
+    "reference_sha256": "9bc57463aad4c8ad008046df65bf33d1818fbba68202db41c102da3b51cffda8",
+    "local_copy_matches": true
+  },
+  {
+    "name": "clock-alpha-pll.h",
+    "path": "include/soc/qcom/clock-alpha-pll.h",
+    "commit": "4075955d5b36f402a0f43ae01b708ae4705ce484",
+    "url": "https://raw.githubusercontent.com/LineageOS/android_kernel_google_marlin/4075955d5b36f402a0f43ae01b708ae4705ce484/include/soc/qcom/clock-alpha-pll.h",
+    "reference_sha256": "44b3b81d57cfc3cd7f2dee1851adc982f3ac578a270bda7b36fd0c5bcee61c7f",
+    "local_copy_matches": true
+  },
+  {
+    "name": "clock-alpha-pll.c",
+    "path": "drivers/clk/msm/clock-alpha-pll.c",
+    "commit": "4075955d5b36f402a0f43ae01b708ae4705ce484",
+    "url": "https://raw.githubusercontent.com/LineageOS/android_kernel_google_marlin/4075955d5b36f402a0f43ae01b708ae4705ce484/drivers/clk/msm/clock-alpha-pll.c",
+    "reference_sha256": "b4eda56be770c0563c15a51212d3046f89fab8435924fd55b9cc5f380359a55a",
+    "local_copy_matches": true
+  },
+  {
+    "name": "qcom-cpufreq.c",
+    "path": "drivers/cpufreq/qcom-cpufreq.c",
+    "commit": "4075955d5b36f402a0f43ae01b708ae4705ce484",
+    "url": "https://raw.githubusercontent.com/LineageOS/android_kernel_google_marlin/4075955d5b36f402a0f43ae01b708ae4705ce484/drivers/cpufreq/qcom-cpufreq.c",
+    "reference_sha256": "3a35f81a52202a25930d21bf98eeb42546409fb95fee917fb742bb05ee29e6d9",
+    "local_copy_matches": true
+  },
+  {
+    "name": "msm8996pro.dtsi",
+    "path": "arch/arm/boot/dts/qcom/msm8996pro.dtsi",
+    "commit": "4075955d5b36f402a0f43ae01b708ae4705ce484",
+    "url": "https://raw.githubusercontent.com/LineageOS/android_kernel_google_marlin/4075955d5b36f402a0f43ae01b708ae4705ce484/arch/arm/boot/dts/qcom/msm8996pro.dtsi",
+    "reference_sha256": "b92b42327a2ba86e06633b142030ed85b36ab852de32067aeafba34db98c9fed",
+    "local_copy_matches": true
+  },
+  {
+    "name": "msm8996.dtsi",
+    "path": "arch/arm/boot/dts/qcom/msm8996.dtsi",
+    "commit": "4075955d5b36f402a0f43ae01b708ae4705ce484",
+    "url": "https://raw.githubusercontent.com/LineageOS/android_kernel_google_marlin/4075955d5b36f402a0f43ae01b708ae4705ce484/arch/arm/boot/dts/qcom/msm8996.dtsi",
+    "reference_sha256": "20694596a1da9c3ac8bc1fcc311d7b5d509602cb3c7c7f3a01c828e8cf8afee5",
+    "local_copy_matches": true
+  },
+  {
+    "name": "clock-pll.c",
+    "path": "drivers/clk/msm/clock-pll.c",
+    "commit": "4075955d5b36f402a0f43ae01b708ae4705ce484",
+    "url": "https://raw.githubusercontent.com/LineageOS/android_kernel_google_marlin/4075955d5b36f402a0f43ae01b708ae4705ce484/drivers/clk/msm/clock-pll.c",
+    "reference_sha256": "fd03a1e26a225fc08d0f0b222c79451b8d1f6de8441352cc9d64aae2d2fe42fe",
+    "local_copy_matches": true
+  }
+]

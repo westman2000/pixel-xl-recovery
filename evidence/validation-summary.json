@@ -1,0 +1,72 @@
+{
+  "selected_sha256": "4635c2c76c37ff34259bfdc15d7e430c95cbc24cfd85cd864b877f0a21d2ccee",
+  "soak_runs": {
+    "E07-soak": {
+      "seconds": 610.83,
+      "checks": 5733,
+      "max_battery_c": 38.2,
+      "iterations_by_phase": {
+        "hash": [
+          725,
+          723,
+          433,
+          405
+        ],
+        "mixed": [
+          115,
+          116,
+          81,
+          75
+        ]
+      }
+    },
+    "E08-soak": {
+      "seconds": 616.83,
+      "checks": 6051,
+      "max_battery_c": 39.0,
+      "iterations_by_phase": {
+        "hash": [
+          742,
+          754,
+          464,
+          470
+        ],
+        "mixed": [
+          115,
+          116,
+          82,
+          84
+        ]
+      }
+    },
+    "E08-post-reboot": {
+      "seconds": 132.44,
+      "checks": 1201,
+      "max_battery_c": 37.0,
+      "iterations_by_phase": {
+        "hash": [
+          146,
+          146,
+          93,
+          94
+        ],
+        "mixed": [
+          23,
+          24,
+          17,
+          17
+        ]
+      }
+    }
+  },
+  "selected_checks": 7252,
+  "selected_load_seconds": 749.27,
+  "selected_max_battery_c": 39.0,
+  "screen_cycles": 10,
+  "repeat_reboots": 3,
+  "float_iterations_per_core": 200000,
+  "selected_image": "boot-stable.img",
+  "physical_devices_tested": 1,
+  "status": "Case evidence from original private harness, not a claim that the public tools ran the full campaign",
+  "source_boot_sha256": "26d5c3e57bfcdd3b45f9d66e4ec7224cfca5ac43a003ff433f19288bd63bcf4c"
+}

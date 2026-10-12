@@ -1,0 +1,22 @@
+Pixel XL Clock Recovery Kit, initial public release 0.1.0
+
+The MIT license applies to the newly written toolkit code and documentation
+distributed in this package. Original upstream components retain their own
+copyrights and licenses; this package does not relicense Android, LineageOS,
+the Linux kernel, Device Tree Compiler/libfdt, or LZ4.
+
+No boot image, decompressed kernel, ramdisk, complete upstream source tree, or
+third-party executable is distributed. Image hashes, data-field offsets,
+selected diagnostic observations, and upstream source links are provided to
+document the case and reproduce a transformation on the owner's own input.
+
+The Linux/LineageOS kernel reference tree includes GPL-licensed code. A person
+who later redistributes a compiled or modified kernel must evaluate and meet
+the applicable upstream redistribution and source obligations. The toolkit's
+MIT license does not substitute for those obligations.
+
+Google, Pixel, Android, LineageOS, Qualcomm, Snapdragon, and other names are
+used to identify the relevant products and projects. This is an independent
+case study; no endorsement, affiliation, or official repair status is claimed.
+
+Reference URLs and provenance limitations are documented in docs/REFERENCES.md.

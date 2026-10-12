@@ -1,0 +1,38 @@
+Public toolkit host tests, publication source revision.
+Command: PIXEL_ORIGINAL_BOOT=<private original boot image> python3 -m unittest discover -s tests -v
+Scope: parsers, transformations, refusal, export, and mocked device orchestration.
+Both profiled boot outputs are rebuilt from the real private source. No phone is contacted by this suite.
+Public CI skips the private-image test; this local run includes it.
+
+test_input_hash_gate (test_toolkit.BootTests) ... ok
+test_invalid_page_refused (test_toolkit.BootTests) ... ok
+test_modern_header_refused (test_toolkit.BootTests) ... ok
+test_nonzero_trailer_refused (test_toolkit.BootTests) ... ok
+test_repack_overflow_refused (test_toolkit.BootTests) ... ok
+test_repack_preserves_ramdisk_and_updates_id (test_toolkit.BootTests) ... ok
+test_rescue_payload_invariant (test_toolkit.BootTests) ... ok
+test_sections (test_toolkit.BootTests) ... ok
+test_truncated_payload_refused (test_toolkit.BootTests) ... ok
+test_bad_fdt_size_refused (test_toolkit.FdtTests) ... ok
+test_cap_preserves_unrelated_properties_and_corners (test_toolkit.FdtTests) ... ok
+test_missing_cluster_refused (test_toolkit.FdtTests) ... ok
+test_too_low_cap_refused (test_toolkit.FdtTests) ... ok
+test_bad_cpu_refused (test_toolkit.LogAndInputTests) ... ok
+test_cpu_lists (test_toolkit.LogAndInputTests) ... ok
+test_export_excludes_identifiers (test_toolkit.LogAndInputTests) ... ok
+test_fastboot_stderr (test_toolkit.LogAndInputTests) ... ok
+test_flash_file_gate (test_toolkit.LogAndInputTests) ... ok
+test_panic_detected (test_toolkit.LogAndInputTests) ... ok
+test_ramoops_is_not_oops (test_toolkit.LogAndInputTests) ... ok
+test_real_oops_detected (test_toolkit.LogAndInputTests) ... ok
+test_serial_injection_refused (test_toolkit.LogAndInputTests) ... ok
+test_exact_profile_outputs (test_toolkit.RealInputTests) ... ok
+test_success (test_toolkit.SoakOrchestrationTests) ... ok
+test_temperature_stop (test_toolkit.SoakOrchestrationTests) ... ok
+test_unexpected_reboot_stop (test_toolkit.SoakOrchestrationTests) ... ok
+test_worker_error_stop (test_toolkit.SoakOrchestrationTests) ... ok
+
+----------------------------------------------------------------------
+Ran 27 tests in 4.106s
+
+OK

@@ -1,0 +1,136 @@
+{
+  "id": "marlin-lineage22-case1",
+  "product": "marlin",
+  "build_observed": "LineageOS 22.2-20261003-NIGHTLY-marlin",
+  "android_release": "15",
+  "kernel_release": "4.4.302+",
+  "source_boot_sha256": "26d5c3e57bfcdd3b45f9d66e4ec7224cfca5ac43a003ff433f19288bd63bcf4c",
+  "source_boot_bytes": 33554432,
+  "page_size": 4096,
+  "header_version": 0,
+  "layout": {
+    "kernel_size": 21889992,
+    "ramdisk_size": 9274872,
+    "page_size": 4096,
+    "id_match": false,
+    "dtbs": [
+      [
+        13470216,
+        419442
+      ],
+      [
+        13889658,
+        422208
+      ],
+      [
+        14311866,
+        422200
+      ],
+      [
+        14734066,
+        419998
+      ],
+      [
+        15154064,
+        419973
+      ],
+      [
+        15574037,
+        422596
+      ],
+      [
+        15996633,
+        419446
+      ],
+      [
+        16416079,
+        422731
+      ],
+      [
+        16838810,
+        419446
+      ],
+      [
+        17258256,
+        422204
+      ],
+      [
+        17680460,
+        419442
+      ],
+      [
+        18099902,
+        419446
+      ],
+      [
+        18519348,
+        422200
+      ],
+      [
+        18941548,
+        422200
+      ],
+      [
+        19363748,
+        419442
+      ],
+      [
+        19783190,
+        419442
+      ],
+      [
+        20202632,
+        422200
+      ],
+      [
+        20624832,
+        420177
+      ],
+      [
+        21045009,
+        422208
+      ],
+      [
+        21467217,
+        422775
+      ]
+    ]
+  },
+  "raw_kernel_sha256": "b604388da1159bfe628c7456d19f30eec1f977acd517a56e1193965c34c718b9",
+  "patched_raw_kernel_sha256": "060e28dee64a273399c292770efdb4bf7c0517d0af98eb112a64df8b2e84a44f",
+  "raw_kernel_bytes": 29104160,
+  "kernel_data_patches": [
+    {
+      "symbol": "pwrcl_alt_pll",
+      "symbol_image_offset": 28305168,
+      "field": "post_div_config",
+      "field_offset": 28305200,
+      "old": 256,
+      "new": 0
+    },
+    {
+      "symbol": "perfcl_alt_pll",
+      "symbol_image_offset": 28305776,
+      "field": "post_div_config",
+      "field_offset": 28305808,
+      "old": 256,
+      "new": 0
+    }
+  ],
+  "lz4_frame_header_hex": "04224d186470b9",
+  "lz4_version_tested": "1.10.0",
+  "caps_hz": {
+    "pwrcl": 1593600000,
+    "perfcl": 902400000
+  },
+  "expected_outputs": {
+    "rescue": "7c6f9d632f45f5b5000e541cef5ae17b48b496e6d9135e5058578da0748cd8e8",
+    "stable": "4635c2c76c37ff34259bfdc15d7e430c95cbc24cfd85cd864b877f0a21d2ccee"
+  },
+  "notes": [
+    "One physical Pixel XL tested; build properties are observations, not authenticated distribution provenance.",
+    "Raw kernel offsets are valid only after the complete input SHA256 matches.",
+    "No boot image or kernel binary is distributed.",
+    "Boot header ID is preserved for rescue, recomputed for stable."
+  ]
+}

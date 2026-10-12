@@ -1,0 +1,902 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pixel XL Clock Recovery — Case Study and Toolkit</title>
+<meta name="description" content="A single-device Pixel XL bootloop investigation, exact-image toolkit, evidence and reproduction plan.">
+<style>
+:root{color-scheme:light;--ink:#18303d;--muted:#526570;--line:#d9e3e8;--blue:#005b80;--paper:#fff}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--ink);background:#f3f6f7;font:17px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+a{color:var(--blue);text-underline-offset:3px}a:hover{color:#002f47}a:focus-visible{outline:3px solid #eeb744;outline-offset:3px}
+.cover{background:#123345;color:#fff;padding:56px max(6vw,24px) 42px}.cover-inner{max-width:1120px;margin:auto}.eyebrow{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#9ed2df}.cover h1{font-size:clamp(32px,4vw,52px);line-height:1.12;max-width:850px;letter-spacing:-.03em;margin:18px 0}.cover p{max-width:820px;color:#d6e4ea;font-size:19px}.facts{display:flex;gap:48px;flex-wrap:wrap;margin-top:32px}.fact strong{font-size:30px;display:block;line-height:1.2}.fact span{font-size:13px;color:#b8d3df}.cover .edition{font-size:13px;margin-top:24px}
+.cover-actions{display:flex;gap:12px;flex-wrap:wrap;margin:26px 0 10px}.cover-actions a{display:inline-block;padding:10px 18px;border:1px solid #8cb6c6;border-radius:6px;color:#eaf7fb;text-decoration:none;font-size:14px;font-weight:600}.cover-actions a:first-child{background:#d8f0df;color:#143b2a;border-color:#d8f0df}.cover-actions a:hover{background:#244c60}.cover-actions a:first-child:hover{background:#bfdfc8}.skip-link{position:absolute;top:-80px;left:20px;background:white;color:#123345;padding:10px 16px;z-index:5}.skip-link:focus{top:12px}.chapter-meta a:focus-visible{outline-offset:2px}
+.layout{max-width:1340px;margin:auto;display:grid;grid-template-columns:250px minmax(0,1fr);gap:38px;padding:40px 28px}.navigation{align-self:start;position:sticky;top:22px;max-height:calc(100vh - 44px);overflow:auto;font-size:14px}.navigation h2{font-size:13px;text-transform:uppercase;letter-spacing:.09em;margin:0 0 14px}.navigation ol{padding-left:20px;margin:0}.navigation li{padding:5px 0}.navigation a{text-decoration:none}.navigation p{color:var(--muted);font-size:12px;border-top:1px solid var(--line);padding-top:16px;margin-right:10px}
+main{min-width:0}section{background:var(--paper);border:1px solid var(--line);border-radius:9px;padding:38px 42px;margin-bottom:32px;scroll-margin-top:20px}section h1{font-size:30px;line-height:1.2;letter-spacing:-.02em;margin:0 0 24px}h2{font-size:23px;line-height:1.3;margin:38px 0 14px;scroll-margin-top:24px}h3{font-size:19px;margin:28px 0 12px}p{margin:14px 0}li{margin:7px 0}ul,ol{padding-left:25px}.chapter-meta{font-size:12px;color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:12px;margin:0 0 24px}.chapter-meta a{text-decoration:none}.local-toc{font-size:14px;background:#f4f8fa;border:1px solid var(--line);border-radius:5px;padding:10px 14px;margin:18px 0 28px}.local-toc summary{cursor:pointer;color:var(--blue)}.local-toc li{margin:3px 0}
+code{font: .87em/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;background:#edf3f6;padding:2px 4px;border-radius:3px;overflow-wrap:anywhere}pre{background:#132d3c;color:#e4f0f5;padding:18px 20px;border-radius:6px;overflow:auto;font-size:14px;line-height:1.65;max-width:100%}pre code{font-size:inherit;background:none;padding:0;color:inherit;overflow-wrap:normal;white-space:pre}.table-wrap{overflow-x:auto;margin:20px 0;border:1px solid var(--line);border-radius:5px}table{border-collapse:collapse;font-size:14px;width:100%;line-height:1.5}th,td{text-align:left;vertical-align:top;padding:12px 13px;border-bottom:1px solid var(--line);min-width:110px}th{background:#eaf1f5;font-weight:650}tbody tr:last-child td{border-bottom:0}tbody tr:nth-child(even){background:#fafcfd}.footer{max-width:1120px;margin:0 auto 40px;padding:0 24px;color:var(--muted);font-size:13px}
+@media(max-width:1000px){.layout{grid-template-columns:1fr;gap:22px;max-width:950px}.navigation{position:static;max-height:none}.navigation ol{columns:2}.navigation p{display:none}}
+@media(max-width:600px){body{font-size:16px}.cover{padding:34px 20px}.cover p{font-size:17px}.facts{gap:24px}.fact strong{font-size:25px}.layout{padding:22px 12px}.navigation{padding:0 12px}.navigation ol{columns:1}section{padding:26px 20px;border-radius:5px}section h1{font-size:26px}h2{font-size:21px}pre{font-size:12px;padding:14px}.table-wrap{margin-left:-4px;margin-right:-4px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media print{body{background:white;font-size:10pt}.cover{background:white;color:black;padding:0 0 20px}.cover p,.cover .eyebrow,.cover .edition,.fact span{color:#333}.cover h1{font-size:26pt}.layout{display:block;padding:0}.navigation,.local-toc,.chapter-meta{display:none}section{border:0;padding:0;margin:0;break-before:page}h1,h2,h3{break-after:avoid}pre{white-space:pre-wrap;background:#f2f2f2;color:black;overflow:visible;font-size:8pt}pre code{white-space:pre-wrap;overflow-wrap:anywhere}.table-wrap{overflow:visible}table{font-size:8pt}tr{break-inside:avoid}a{color:inherit}.footer{padding:0}}
+</style><link rel="canonical" href="https://westman2000.github.io/pixel-xl-recovery/"></head><body><a class="skip-link" href="#main">Skip to documentation</a>
+<header class="cover"><div class="cover-inner"><div class="eyebrow">Independent investigation · Pixel XL / marlin</div>
+<h1>From a bootloop to four working cores</h1>
+<p>A complete case study, recovery runbook, exact-image toolkit, and plan for independent reproduction.</p>
+<div class="cover-actions"><a href="#chapter-2">Read the case study</a><a href="#chapter-3">Recovery guide</a><a href="https://github.com/westman2000/pixel-xl-recovery/releases/latest">Download toolkit ↗</a></div>
+<div class="facts"><div class="fact"><strong>1 device</strong><span>Scope of the hardware evidence</span></div><div class="fact"><strong>4 cores</strong><span>Working in the retained configuration</span></div><div class="fact"><strong>7,252</strong><span>Recorded final-image correctness checks</span></div></div>
+<p class="edition">Release 0.1.0 · October 12, 2026 · English reference edition · No trackers or external scripts</p></div></header>
+<div class="layout"><nav class="navigation" id="contents" aria-label="Chapters"><h2>Contents</h2><ol><li><a href="#chapter-1">Overview</a></li><li><a href="#chapter-2">Case study</a></li><li><a href="#chapter-3">Recovery runbook</a></li><li><a href="#chapter-4">Image implementation</a></li><li><a href="#chapter-5">Validation and evidence</a></li><li><a href="#chapter-6">Tool reference</a></li><li><a href="#chapter-7">Research and porting plan</a></li><li><a href="#chapter-8">References</a></li><li><a href="#chapter-9">Contributing</a></li><li><a href="#chapter-10">Device report template</a></li><li><a href="#chapter-11">Prepared public post</a></li><li><a href="#chapter-12">Release history</a></li></ol>
+<p>The source files and evidence are included alongside this reader. No firmware binaries are distributed. <a href="https://github.com/westman2000/pixel-xl-recovery">Project on GitHub</a> · <a href="https://github.com/westman2000/pixel-xl-recovery/releases">Releases</a></p></nav>
+<main id="main"><section id="chapter-1"><p class="chapter-meta">01 / 12 &nbsp; · &nbsp; <a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/README.md">Markdown source</a> &nbsp; · &nbsp; <a href="#contents">Contents</a></p><h1 id="chapter-1-heading-1">Pixel XL clock recovery investigation and toolkit</h1>
+<details class="local-toc"><summary>In this chapter</summary><ul><li><a href="#chapter-1-heading-2">Start with the appropriate path</a></li><li><a href="#chapter-1-heading-3">What changed</a></li><li><a href="#chapter-1-heading-4">Compatibility before convenience</a></li><li><a href="#chapter-1-heading-5">Quick offline reproduction</a></li><li><a href="#chapter-1-heading-6">Included tools</a></li><li><a href="#chapter-1-heading-7">Evidence and validation</a></li><li><a href="#chapter-1-heading-8">Sharing and attribution</a></li></ul></details>
+<p>An instrumented case study of a first-generation Google Pixel XL, codename <strong>marlin</strong>, that repeatedly failed to boot. A two-core boot option first restored Android. Further experiments restored all four cores using alternate CPU PLLs, corrected output dividers, and conservative frequency limits.</p>
+<p>Start with the <a href="#chapter-2">case study</a> to read the investigation, or the <a href="#chapter-3">recovery runbook</a> to follow the diagnostic sequence. All documentation is in English.</p>
+<p><strong>[Read the website](https://westman2000.github.io/pixel-xl-recovery/)</strong> · <strong>[Download the latest release](https://github.com/westman2000/pixel-xl-recovery/releases/latest)</strong> · <a href="https://github.com/westman2000/pixel-xl-recovery/issues/new/choose">Report a result or problem</a> · <a href="https://github.com/westman2000/pixel-xl-recovery/actions/workflows/host-checks.yml">Host checks</a></p>
+<p>For the single offline reading copy, download and extract the release archive, then open <code>READ-ME.html</code> in a browser. GitHub displays HTML as source; the Markdown chapters above can be read directly on GitHub. Keep the extracted files together so the reader&#x27;s evidence links work.</p>
+<p><strong>One physical device was tested. This is a documented workaround with a narrowly supported image builder, not a universal bootloop repair.</strong> The exact physical defect remains unknown. The results justify further investigation of the normal clock path; they do not prove that a particular transistor, solder joint, power rail, or PLL is damaged.</p>
+<p>The retained configuration passed approximately 12 minutes of concurrent correctness workloads, 7,252 checksum and compression checks, 800,000 floating-point test iterations across four cores, three normal reboots, and ten display Dozing/Awake transitions. Maximum sampled battery temperature during its load runs was 39.0 °C. These are bounded tests, not evidence of months of reliable operation.</p>
+<h2 id="chapter-1-heading-2">Start with the appropriate path</h2>
+<div class="table-wrap"><table><thead><tr>
+<th scope="col">Your situation</th>
+<th scope="col">Start here</th>
+</tr></thead><tbody>
+<tr><td>You want the complete story and evidence</td><td><a href="#chapter-2">Case study</a></td></tr>
+<tr><td>Your Pixel XL is bootlooping and you need a cautious sequence</td><td><a href="#chapter-3">Recovery runbook</a></td></tr>
+<tr><td>You want to inspect or reproduce the boot modifications</td><td><a href="#chapter-4">Implementation</a></td></tr>
+<tr><td>You want exact test methodology and evidence limits</td><td><a href="#chapter-5">Validation</a></td></tr>
+<tr><td>You want the CLI commands and their limits</td><td><a href="#chapter-6">Tool reference</a></td></tr>
+<tr><td>Your boot image differs from this case</td><td><a href="#chapter-7">Porting and research plan</a></td></tr>
+<tr><td>You want to help reproduce or publish results</td><td><a href="#chapter-9">Contributing</a> and <a href="#chapter-10">report template</a></td></tr>
+</tbody></table></div>
+<p>The case involved <strong>LineageOS 22.2-20261003-NIGHTLY-marlin</strong>, Android 15, and a kernel reporting <code>4.4.302+</code>. These are observed properties. They do not authenticate where the ROM came from, identify its exact build source commit, or establish support for another release with a similar name. The runtime fingerprint was inconsistent with the actual Android release and was not used as the image identity.</p>
+<h2 id="chapter-1-heading-3">What changed</h2>
+<div class="table-wrap"><table><thead><tr>
+<th scope="col">Component</th>
+<th scope="col">Retained setting</th>
+</tr></thead><tbody>
+<tr><td>CPU availability</td><td>All four CPUs, numbered 0–3</td></tr>
+<tr><td>Efficient cluster CPU0/1</td><td>Maximum 1,593,600 kHz</td></tr>
+<tr><td>Performance cluster CPU2/3</td><td>Maximum 902,400 kHz</td></tr>
+<tr><td>CPU clock parents</td><td>Alternate PLLs for both clusters</td></tr>
+<tr><td>ACD option</td><td>Disabled for the alternate-PLL mode</td></tr>
+<tr><td>Alternate PLL output dividers</td><td>Changed from divide-by-two to divide-by-one</td></tr>
+<tr><td>Retained voltage entries and thermal configuration</td><td>Preserved</td></tr>
+<tr><td>Android system and vendor partitions</td><td>Not flashed in these experiments</td></tr>
+<tr><td>Recovery fallback</td><td>A previously tested boot image limited to two CPUs</td></tr>
+</tbody></table></div>
+<p>Only <strong>two data bytes in the decompressed kernel</strong> were changed for the divider correction. That is not the total size of the boot-image modification: command-line fields, device-tree frequency tables, compressed kernel bytes, layout offsets, and the legacy header checksum also changed.</p>
+<p>The original boot already included <code>lpm_levels.sleep_disabled=1</code>. It was preserved. Display transitions are therefore not presented as proof of deep suspend or good standby battery life.</p>
+<h2 id="chapter-1-heading-4">Compatibility before convenience</h2>
+<p>The offline builder accepts only an original boot image with this full SHA-256:</p>
+<pre><code>26d5c3e57bfcdd3b45f9d66e4ec7224cfca5ac43a003ff433f19288bd63bcf4c</code></pre>
+<p>That restriction protects against applying raw kernel offsets to a different binary. It is <strong>not</strong> a claim that every phone using this image can safely use the workaround. A matching image can still run on a phone with a different fault.</p>
+<p>No boot images, kernel binaries, personal device identifiers, screenshots, or complete private logs are included. Obtain a backup of your own matching installation. If its hash differs, use the diagnostic tools and porting plan; do not change the expected hash merely to bypass the check.</p>
+<p>This kit does not cover Pixel 2 or newer devices, the smaller <code>sailfish</code> Pixel, Nexus devices, locked bootloaders, modern <code>vendor_boot</code>/<code>init_boot</code> layouts, AVB signing, or arbitrary Snapdragon boards. Related hardware is a research lead, not a compatibility guarantee.</p>
+<h2 id="chapter-1-heading-5">Quick offline reproduction</h2>
+<p>Requirements: Python 3.9 or newer and, for the four-core build, the LZ4 command-line program. The exact reconstruction was verified with <strong>LZ4 1.10.0</strong>. Standard-library Python is sufficient; no Python packages need to be installed.</p>
+<p>Get the tools by extracting a release archive or cloning the repository:</p>
+<pre><code>git clone https://github.com/westman2000/pixel-xl-recovery.git
+cd pixel-xl-recovery</code></pre>
+<p>Run these commands from the kit directory. Keep original images and generated outputs outside the public project:</p>
+<pre><code>python3 tools/inspect_boot.py ../private/boot-original.img
+
+python3 tools/build_boot.py \
+  --boot ../private/boot-original.img \
+  --profile profiles/marlin-lineage22-case1.json \
+  --variant rescue \
+  --out ../private/rescue-build
+
+python3 tools/build_boot.py \
+  --boot ../private/boot-original.img \
+  --profile profiles/marlin-lineage22-case1.json \
+  --variant stable \
+  --out ../private/stable-build</code></pre>
+<p>The builder never contacts a phone. It rejects existing output directories and writes an image only after the result matches the recorded case hash. “Stable” is the retained case variant name; it does not certify a new device.</p>
+<p>Expected outputs:</p>
+<pre><code>rescue  7c6f9d632f45f5b5000e541cef5ae17b48b496e6d9135e5058578da0748cd8e8
+stable  4635c2c76c37ff34259bfdc15d7e430c95cbc24cfd85cd864b877f0a21d2ccee</code></pre>
+<p>Read the runbook before installing either image. On the case device, <code>fastboot boot</code> rejected both the original and modified images with <code>dtb not found</code>; temporary boot was not an available escape hatch. Recovery was contained in the boot image, so modifying boot affected the recovery path too.</p>
+<h2 id="chapter-1-heading-6">Included tools</h2>
+<div class="table-wrap"><table><thead><tr>
+<th scope="col">Tool</th>
+<th scope="col">Purpose</th>
+<th scope="col">Device effects</th>
+</tr></thead><tbody>
+<tr><td><code>inspect_boot.py</code></td><td>Inspect a supported raw legacy image</td><td>None</td></tr>
+<tr><td><code>build_boot.py</code></td><td>Reproduce the two hash-gated case images</td><td>None</td></tr>
+<tr><td><code>collect.py</code></td><td>Capture selected diagnostics and optionally back up active boot</td><td>Reads from the device; no root enablement or reboot</td></tr>
+<tr><td><code>flash_plan.py</code></td><td>Check files and a device already in fastboot, then print commands</td><td>Read-only fastboot queries; never flashes</td></tr>
+<tr><td><code>soak.py</code></td><td>Run bounded per-core hash and compression checks</td><td>Temporary RAM-backed files and CPU load</td></tr>
+<tr><td><code>export_summary.py</code></td><td>Export an allowlist of numerical test results</td><td>None</td></tr>
+<tr><td><code>floating_point.awk</code></td><td>Preserve the numerical workload used in E08</td><td>None until explicitly run on a target</td></tr>
+</tbody></table></div>
+<p>The recovery runbook supplies the deliberate installation, rollback, and reboot steps. There is no automatic bootloader unlock, slot switch, wipe, frequency override, thermal disable, or unattended flashing loop in these tools.</p>
+<h2 id="chapter-1-heading-7">Evidence and validation</h2>
+<ul>
+<li><a href="#chapter-2">Experiment history</a> includes failed approaches as well as successful ones.</li>
+<li><a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/evidence/validation-summary.json">Numerical results</a> preserve exact counts, durations, and temperatures.</li>
+<li><a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/evidence/pll-log-excerpts.txt">PLL excerpts</a> show the observed failure signature.</li>
+<li><a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/evidence/image-ledger.json">Image ledger</a> identifies the original and intermediate images.</li>
+<li><a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/evidence/source-references.json">Reference source hashes</a> distinguish reference code from the unknown exact ROM build provenance.</li>
+<li><a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/evidence/tool-tests.txt">Host test output</a> records the public toolkit tests.</li>
+</ul>
+<p>The original device campaign used a private, device-specific harness. The public version was refactored afterwards. Its parser, transformation, refusal, redaction, and stress orchestration paths have host tests; both boot outputs were reconstructed byte-for-byte from the private original image. The phone was no longer available over ADB during packaging, so the new public collector and stress wrapper have <strong>not</strong> been newly validated against the phone. Simulated transport tests are labelled as such.</p>
+<h2 id="chapter-1-heading-8">Sharing and attribution</h2>
+<p>New toolkit code and documentation are provided under the <a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/LICENSE">MIT license</a>. Upstream Android, LineageOS, Linux, and LZ4 components retain their own licenses; see <a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/NOTICE">NOTICE</a>. This is an independent community investigation, not an official Google or LineageOS repair procedure.</p>
+<p><a href="#chapter-11">PUBLIC-POST.md</a> provides a shareable English summary, and <a href="#chapter-8">References</a> records upstream sources. The project is maintained at <a href="https://github.com/westman2000/pixel-xl-recovery">westman2000/pixel-xl-recovery</a>. Use <a href="https://github.com/westman2000/pixel-xl-recovery/issues">GitHub issues</a> for reviewed reproduction reports and tool problems.</p>
+<p>GitHub Actions runs the host suite on Python 3.9 and 3.12 and checks documentation and package hashes. The private-image reconstruction test is skipped in public CI because firmware is not distributed; it passed locally with the real case input. See <a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/evidence/tool-tests.txt">the local test transcript</a>.</p>
+<p>Keep raw collections private. Review exported summaries before posting them. To contribute, start with the template and explain exactly what was observed, what was changed, and what failed. A second independently reproduced device is more valuable than an unsupported claim of a universal fix.</p></section>
+<section id="chapter-2"><p class="chapter-meta">02 / 12 &nbsp; · &nbsp; <a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/docs/CASE-STUDY.md">Markdown source</a> &nbsp; · &nbsp; <a href="#contents">Contents</a></p><h1 id="chapter-2-heading-1">Pixel XL bootloop investigation</h1>
+<details class="local-toc"><summary>In this chapter</summary><ul><li><a href="#chapter-2-heading-2">Finding and scope</a></li><li><a href="#chapter-2-heading-3">Device and software observations</a></li><li><a href="#chapter-2-heading-4">Initial evidence</a></li><li><a href="#chapter-2-heading-5">Establishing a recovery baseline</a></li><li><a href="#chapter-2-heading-6">Preliminary performance and battery observations</a></li><li><a href="#chapter-2-heading-7">Experiment sequence</a></li><li><a href="#chapter-2-heading-8">Finding the alternate clock path</a></li><li><a href="#chapter-2-heading-9">Discovering the divide by two behavior</a></li><li><a href="#chapter-2-heading-10">Frequency caps and image construction</a></li><li><a href="#chapter-2-heading-11">Retained configuration and results</a></li><li><a href="#chapter-2-heading-12">The false log alarm</a></li><li><a href="#chapter-2-heading-13">What the evidence supports</a></li><li><a href="#chapter-2-heading-14">Limits and remaining issues</a></li></ul></details>
+<h2 id="chapter-2-heading-2">Finding and scope</h2>
+<p>A Pixel XL that had been unused for years was connected for experimental recovery. It could reach fastboot and recovery, but Android repeatedly failed to stay up. Restricting boot to CPU0 and CPU1 produced a usable Android session. Later, all four cores executed correct workloads after switching both CPU clusters to alternate PLLs, disabling ACD for that mode, correcting two alternate-PLL divider settings, and limiting the performance cluster to 902.4 MHz.</p>
+<p>The retained configuration also limits CPU0/1 to 1,593.6 MHz. This prevents the approximately 1,996.8 MHz bursts observed when relying only on runtime limits. The owner explicitly preferred stability over maximum speed.</p>
+<p>This is an experiment on <strong>one physical phone</strong>. It establishes a functioning workaround for that phone and image under the recorded tests. It does not establish the prevalence of the fault, prove the physical location of damage, or certify any other unit. No microscopic inspection, oscilloscope measurement, power-rail probing, solder repair, or exact source-rebuilt control kernel was part of the investigation.</p>
+<h2 id="chapter-2-heading-3">Device and software observations</h2>
+<div class="table-wrap"><table><thead><tr>
+<th scope="col">Item</th>
+<th scope="col">Observation</th>
+</tr></thead><tbody>
+<tr><td>Product</td><td>Google Pixel XL, <code>marlin</code></td></tr>
+<tr><td>SoC family</td><td>MSM8996pro / Snapdragon 821</td></tr>
+<tr><td>CPU arrangement</td><td>Four Kryo CPUs in two frequency-sharing clusters</td></tr>
+<tr><td>CPU0/1</td><td>Efficient cluster, clock names using <code>pwrcl</code></td></tr>
+<tr><td>CPU2/3</td><td>Performance cluster, clock names using <code>perfcl</code></td></tr>
+<tr><td>Bootloader</td><td>Unlocked; reported version <code>8996-012001-1908071822</code></td></tr>
+<tr><td>Active slot during the campaign</td><td><code>a</code></td></tr>
+<tr><td>Installed system reported</td><td>LineageOS <code>22.2-20261003-NIGHTLY-marlin</code></td></tr>
+<tr><td>Android release / kernel release</td><td>15 / <code>4.4.302+</code></td></tr>
+<tr><td>Boot image</td><td>32 MiB raw legacy Android boot image, header version 0</td></tr>
+<tr><td>Kernel payload</td><td>LZ4 frame followed by 20 appended device trees</td></tr>
+<tr><td>Ramdisk</td><td>Preserved throughout the successful modifications</td></tr>
+<tr><td>Runtime clock bin</td><td>Performance/power/CBF speed bin 1, PVS version 0</td></tr>
+</tbody></table></div>
+<p>The build fingerprint suggested Android 10 while other properties and the running system identified Android 15. The investigation therefore used the image hash, kernel contents, relevant properties, and runtime state together. A plausible fingerprint is not a compatibility check.</p>
+<p>Host records place the main experiment campaign on 2026-10-12 UTC. The phone clock and battery first-use fields showed different dates. Phone timestamps were not treated as trustworthy chronology. The original private directory used the preceding local calendar date.</p>
+<p>The original image SHA-256 was:</p>
+<pre><code>26d5c3e57bfcdd3b45f9d66e4ec7224cfca5ac43a003ff433f19288bd63bcf4c</code></pre>
+<p>The exact source commit and distribution provenance of that compiled image were not established. Reference source files were later pinned to a public LineageOS commit and checked against the copies used during investigation. Matching those files does not identify the compiled kernel&#x27;s full source tree or configuration.</p>
+<h2 id="chapter-2-heading-4">Initial evidence</h2>
+<p>The preserved console from a failed Android boot contained <strong>100</strong> messages reporting that <code>perfcl_pll</code> did not lock. The captured boot ended around 50 seconds. It did not contain a conclusive panic explaining the reset. The matching message was:</p>
+<pre><code>PLL perfcl_pll didn&#x27;t lock after enabling it!</code></pre>
+<p>A PLL is a circuit used to synthesize a clock frequency. In this context, “lock” indicates that the expected stabilized state was detected. A log saying that the lock condition was not reached identifies a clock-path problem worth investigating; it does not by itself identify a damaged component.</p>
+<p>Recovery provided an important counterexample. All four CPUs could be online there for several minutes, with five early matching messages in its captured log. That observation made “both large cores are completely dead” an inadequate explanation.</p>
+<p>The initial diagnosis remained a hypothesis: Android activity, clock changes, or a related mode transition appeared to expose a problem associated with the performance cluster&#x27;s normal clock path. Different workloads and power states in recovery could matter. The observations did not isolate which of those differences was decisive.</p>
+<h2 id="chapter-2-heading-5">Establishing a recovery baseline</h2>
+<p>The first useful boot modification appended:</p>
+<pre><code>nr_cpus=2 maxcpus=2</code></pre>
+<p>Only the boot-header command line changed. The compressed kernel, device trees, ramdisk, and original header ID were preserved. Android then booted and remained usable long enough to collect diagnostics and plan controlled experiments. CPU0/1 formed the practical recovery baseline.</p>
+<p>This was more than a temporary runtime CPU-offline operation: the boot-time options limited the CPU set made available to the kernel. Runtime attempts to use unavailable CPUs were not assumed to be meaningful tests of their hardware.</p>
+<p>The rescue image hash was:</p>
+<pre><code>7c6f9d632f45f5b5000e541cef5ae17b48b496e6d9135e5058578da0748cd8e8</code></pre>
+<p>This image remained the primary fallback throughout the campaign. The Android bootloader was already unlocked. The experiments did not establish a data-preserving way to unlock a locked device.</p>
+<p>Temporary boot was attempted with both original and changed images; the bootloader rejected them with <code>dtb not found</code>. The investigation therefore used explicit writes to <code>boot_a</code>, followed by normal boot and verification. <code>boot_b</code>, system, and vendor were not flashed, and slots were not switched. The boot image also supplied recovery on this installation, so a fallback boot image and the ability to enter fastboot were essential.</p>
+<h2 id="chapter-2-heading-6">Preliminary performance and battery observations</h2>
+<p>The two-core system was noticeably slower than a fully functioning four-core configuration would be expected to be. Several separate observations were made before the clock-path experiments:</p>
+<ul>
+<li>CPU0/1 briefly accepted a near-2 GHz setting when both relevant runtime limits were adjusted. A narrow parallel SHA-256 workload improved by about 21% in that short comparison. The system subsequently restored the lower limit. This was not a whole-phone benchmark or a basis for a long-term overclock.</li>
+<li>Some Android/vendor cpuset groups behaved poorly with only two CPUs available. Temporary two-core cpuset adjustments helped that restricted configuration. Those settings were not appropriate for the eventual four-core configuration, where the normal top-app group contained CPU0–3.</li>
+<li>Rendering resolution was changed to 1080 × 1920 and animation scales to 0.5. These are UI changes, not repairs to CPU hardware. The final measured density override was 448; an earlier note recorded 420. The measured 448 setting was left alone rather than silently overwritten.</li>
+<li>Battery temperature and charging data were readable. Full-charge capacity equalled the configured design value and cycle count was zero, but the device history and recent first-use metadata made those fields unsuitable for calculating battery health. No complete discharge-capacity test was performed.</li>
+</ul>
+<p>These observations are retained because they explain earlier choices and prevent unrelated UI or battery changes from being credited with the clock recovery.</p>
+<h2 id="chapter-2-heading-7">Experiment sequence</h2>
+<p>The experiment IDs below refer to saved artifacts, not different devices. Each image was identified by SHA-256, and successful boots were checked through ADB rather than inferred from a completed flash command.</p>
+<div class="table-wrap"><table><thead><tr>
+<th scope="col">Stage</th>
+<th scope="col">Configuration</th>
+<th scope="col">Observation</th>
+<th scope="col">Consequence</th>
+</tr></thead><tbody>
+<tr><td>Rescue baseline</td><td>Two CPUs, original clock path</td><td>Android booted and remained usable</td><td>Preserve as rollback</td></tr>
+<tr><td>E01</td><td>Two CPUs; performance-cluster DT tables capped near 902 MHz</td><td>Booted; live DT and image checked; one early PLL warning</td><td>Validate the DT modification before exposing another CPU</td></tr>
+<tr><td>E02</td><td>Three CPUs; same frequency cap; original clock path</td><td>Booted, logged 58 PLL-lock failures, then restarted before planned CPU2 stress began</td><td>Low frequency alone was insufficient</td></tr>
+<tr><td>E03</td><td>Two CPUs; alternate PLLs; ACD off</td><td>Booted and produced correct hashes</td><td>Alternate path was viable for the control pair</td></tr>
+<tr><td>E04</td><td>Three CPUs; alternate PLLs; ACD off</td><td>CPU2 completed 50 pinned checks correctly</td><td>The first performance core could execute real work</td></tr>
+<tr><td>E05</td><td>Four CPUs; alternate PLLs; ACD off</td><td>Five pinned hashes per core, 20 total, were correct</td><td>Both performance cores could execute work</td></tr>
+<tr><td>E06</td><td>Two CPUs; alternate output dividers changed to divide-by-one</td><td>Six checks passed; measured efficient-cluster clock returned to about 1.594 GHz</td><td>Validate the divider correction on the control pair</td></tr>
+<tr><td>E07</td><td>Four CPUs; corrected dividers; performance cap 902.4 MHz</td><td>Ten-minute load campaign passed; occasional CPU0/1 boosts near 2 GHz observed</td><td>Keep the working path, remove unwanted boosts</td></tr>
+<tr><td>E08</td><td>E07 plus efficient-cluster DT cap 1,593.6 MHz</td><td>Full retained-configuration validation passed</td><td>Leave this conservative image installed</td></tr>
+</tbody></table></div>
+<p>For E02, ADB reappeared during the next boot and was used to enter fastboot and restore the known-working image. The subsequently captured pstore included the intercepted boot and shutdown; it did not establish the original reset&#x27;s precise cause. This distinction matters: “the phone restarted after repeated PLL warnings” is supported, while “a captured kernel panic proved the PLL caused the reset” is not.</p>
+<h2 id="chapter-2-heading-8">Finding the alternate clock path</h2>
+<p>Inspection of the reference clock driver identified an alternate-PLL mode and a corresponding ACD restriction. The boot options used were:</p>
+<pre><code>clock_cpu_8996.use_alt_pll=1 clock_cpu_8996.enable_acd=0</code></pre>
+<p>Both options matter. The <a href="https://github.com/LineageOS/android_kernel_google_marlin/blob/4075955d5b36f402a0f43ae01b708ae4705ce484/drivers/clk/msm/clock-cpu-8996.c">reference CPU clock driver</a> contains the alternate-parent selection and rejects the combination of alternate PLLs with ACD enabled. Here ACD refers to adaptive clock distribution, a separate part of the clock-control arrangement.</p>
+<p>The options were not accepted merely because they appeared in a command line. Runtime checks read the module parameters and actual mux parents:</p>
+<pre><code>pwrcl_hf_mux parent  -&gt; pwrcl_alt_pll
+perfcl_hf_mux parent -&gt; perfcl_alt_pll</code></pre>
+<p>The observation was encouraging but also confounded: the experiment changed the selected PLL path <strong>and</strong> the ACD mode. It therefore cannot separate a primary-PLL problem from an ACD-related issue, or a combination of the two.</p>
+<h2 id="chapter-2-heading-9">Discovering the divide by two behavior</h2>
+<p>Early alternate-PLL experiments were slower than their reported frequency values suggested. Measuring clocks under load exposed the discrepancy:</p>
+<div class="table-wrap"><table><thead><tr>
+<th scope="col">Cluster</th>
+<th scope="col">Reported rate before correction</th>
+<th scope="col">Measured rate before correction</th>
+</tr></thead><tbody>
+<tr><td>Efficient</td><td>1,593.6 MHz</td><td>Approximately 796.8 MHz</td></tr>
+<tr><td>Performance</td><td>902.4 MHz</td><td>Approximately 451.2 MHz</td></tr>
+</tbody></table></div>
+<p>Idle measurements were not reliable evidence of maximum frequency because clock gating could yield much smaller values. The comparison was made while work was running, with a brief request for existing permitted minimum frequencies; the original minimums were restored afterwards.</p>
+<p>The structures associated with the alternate PLLs contained <code>post_div_config = 0x100</code>, representing the divide-by-two setting in the reference code. Live symbols from the same running kernel helped locate these structures in the decompressed image. The structure layout was checked against <a href="https://github.com/LineageOS/android_kernel_google_marlin/blob/4075955d5b36f402a0f43ae01b708ae4705ce484/include/soc/qcom/clock-alpha-pll.h">the PLL header</a>, and the treatment of its fields was checked against <a href="https://github.com/LineageOS/android_kernel_google_marlin/blob/4075955d5b36f402a0f43ae01b708ae4705ce484/drivers/clk/msm/clock-alpha-pll.c">the alpha PLL implementation</a>.</p>
+<p>Each <code>post_div_config</code> value was changed from 256 to zero. In this specific little-endian binary, each change cleared one byte, for two changed bytes in total. Adjacent values were validated as well. Kernel instructions were not patched.</p>
+<p>After the correction, E06 measured approximately 1,593.595 MHz for a requested 1,593.6 MHz. E07 and E08 also measured approximately 902.4 MHz on the performance cluster. Computation checks continued to pass. The result connected the suspected divider error to an observed clock and workload effect.</p>
+<p>The temporary change needed to read kernel symbol addresses was reversed: <code>kptr_restrict</code> was restored to its original value of 2. This is not a request for other users to leave kernel pointers exposed.</p>
+<h2 id="chapter-2-heading-10">Frequency caps and image construction</h2>
+<p>The original performance tables included frequencies up to 2,150.4 MHz for the observed speed bin. Early experiments retained only entries at or below 902.4 MHz. Device-tree variants with different frequency steps had a retained maximum of 883.2 MHz; the actual phone used the 902.4 MHz variant.</p>
+<p>Each boot payload contained twenty device trees. All three performance speed-bin tables in each were processed, sixty tables total. E08 additionally processed all sixty efficient-cluster speed-bin tables to impose a 1,593.6 MHz upper bound. Retained frequency/voltage pairs were copied without changing voltage values. Every unrelated property was checked for byte equality.</p>
+<p>The tables were shortened in place: removed property data was replaced with legal FDT NOP tokens. This preserved each DTB&#x27;s overall size and the appended DTB sequence. The <a href="https://devicetree-specification.readthedocs.io/en/stable/flattened-format.html">device-tree specification</a> defines those structural tokens. Independent <code>libfdt</code> reads verified the resulting tables during the original campaign.</p>
+<p>The corrected kernel was recompressed with LZ4. Its compressed size changed, so the ramdisk had to be placed at the new page-aligned offset and the kernel-size field updated. The stable image&#x27;s legacy header ID was recomputed. A separate AOSP unpacker confirmed the payload layout and unchanged ramdisk. The <a href="#chapter-4">implementation document</a> provides the exact numbers and checks.</p>
+<p>No inference about image format was made from the Android release number. This installation ran Android 15 using a legacy header-v0 image; the actual bytes were authoritative for parsing.</p>
+<h2 id="chapter-2-heading-11">Retained configuration and results</h2>
+<p>E08 was retained with four online CPUs, alternate clock parents, ACD disabled, divide-by-one output settings, and caps of 1,593.6/902.4 MHz. These settings reside in the boot image and were confirmed after repeated normal boots. Runtime frequency-forcing daemons were not installed.</p>
+<div class="table-wrap"><table><thead><tr>
+<th scope="col">Run</th>
+<th scope="col">Elapsed harness time</th>
+<th scope="col">Verified checks</th>
+<th scope="col">Maximum sampled battery temperature</th>
+</tr></thead><tbody>
+<tr><td>E07 preliminary four-core load</td><td>610.83 s</td><td>5,733</td><td>38.2 °C</td></tr>
+<tr><td>E08 main load</td><td>616.83 s</td><td>6,051</td><td>39.0 °C</td></tr>
+<tr><td>E08 load after three reboots</td><td>132.44 s</td><td>1,201</td><td>37.0 °C</td></tr>
+<tr><td>E08 combined</td><td>749.27 s</td><td>7,252</td><td>39.0 °C</td></tr>
+</tbody></table></div>
+<p>Elapsed harness time includes sampling and phase boundaries. The requested E08 worker durations were five minutes of hashing and five minutes of mixed work, followed later by one minute of each. Describing that as about twelve minutes of load is more informative than treating every harness second as uninterrupted maximum utilization.</p>
+<p>Each core had a separately pinned worker. The test data was a deterministic 32 MiB buffer containing pseudorandom and repeated-byte regions. Expected SHA-256 and SHA-512 digests were computed on the host. The mixed workload added gzip compression, decompression, and verification of the recovered bytes. One hash-phase iteration counted as two checks; one mixed iteration counted as three. These counts are not independent statistically distributed trials of every possible CPU instruction or every RAM address.</p>
+<p>The efficient and performance cores all produced correct results. Sampled CPU accounting during the main E08 work intervals showed approximately 99.8–100% busy time. Boot identities remained unchanged within each load run. The thermal service remained running. The test harness used an additional conservative 40 °C battery cutoff; it did not need to stop either completed E08 run for temperature.</p>
+<p>After the main run, ten display transitions from <code>Dozing</code> to <code>Awake</code> succeeded. Three requested normal reboots produced three distinct boot identities. The installed image hash, online CPUs, clock parents, and frequency limits were checked after each.</p>
+<p>A separate floating-point workload executed 200,000 iterations on each of four cores. It checked square-root, trigonometric, and logarithm/exponential identities within declared tolerances. All cores produced the same recorded maxima: approximately <code>2.84e-14</code>, <code>2.22e-16</code>, and <code>8.53e-14</code>, respectively. The trigonometric accumulation was 200,000. This adds coverage beyond byte hashing, without claiming exhaustive FPU or SIMD validation.</p>
+<p>The final image SHA-256 was:</p>
+<pre><code>4635c2c76c37ff34259bfdc15d7e430c95cbc24cfd85cd864b877f0a21d2ccee</code></pre>
+<h2 id="chapter-2-heading-12">The false log alarm</h2>
+<p>The first automatic E08 result was marked failed after both load phases had completed successfully. Its kernel-error regular expression searched for <code>Oops:</code> without a word boundary. It therefore matched the substring in a normal <code>ramoops: attached</code> initialization message.</p>
+<p>The complete matching line, live log, final log, boot identity, and worker results were reviewed. The original result file was preserved. The expression was corrected to require a word boundary, then the existing logs were checked again. The E08 result was marked passed with an explicit review note; the history was not rewritten to conceal the harness failure.</p>
+<p>The public toolkit includes tests showing that normal ramoops registration is accepted while an actual Oops or panic is detected. Error detectors can themselves introduce false conclusions; a failed automation check must be interpreted before it becomes a hardware diagnosis.</p>
+<h2 id="chapter-2-heading-13">What the evidence supports</h2>
+<p>The strongest supported finding is a dependence on clock-path configuration. Low frequency with the original path was insufficient in E02. The alternate-path configuration allowed both performance CPUs to compute correctly and remain online during the recorded loads. Correcting the dividers changed measured clocks and restored the expected frequency behavior.</p>
+<p>The original failing capture had 100 performance-PLL warnings, E02 had 58, and the final boots each retained one early warning around 1.3 seconds. No repeated lock-failure sequence appeared during the successful load runs. The remaining early warning should not be hidden or relabelled as zero errors. It is consistent with the fact that selecting an alternate running path does not remove all primary-clock initialization.</p>
+<p>Hardware instability in the normal PLL, its supply, or associated clock logic is a plausible explanation. An ACD-specific problem or a driver/initialization interaction remains plausible too. The experiment did not hold all those factors constant independently, so it cannot rank individual physical components with confidence. A “reflow the CPU” conclusion, a precise solder diagnosis, or a claim that two cores had physically died would exceed the evidence.</p>
+<h2 id="chapter-2-heading-14">Limits and remaining issues</h2>
+<ul>
+<li>One device and one original image were investigated. No second-device replication or controlled comparison with a known-healthy Pixel XL was performed.</li>
+<li>The retained mode trades peak frequency for a tested operating configuration. This campaign did not establish the highest stable frequency or overall UI speed relative to a healthy stock phone.</li>
+<li>Sustained operation over days, deep suspend, standby drain, power-off cold starts, radio workloads, camera use, and GPU-heavy applications were not validated by these tests.</li>
+<li>Battery temperature was monitored, but the reported capacity and cycle fields did not establish battery state of health.</li>
+<li>The ROM also showed Java exceptions in Google Carrier Services and hotword enrollment. Correct CPU arithmetic does not repair missing providers or application permission problems.</li>
+<li>An OTA or boot-image replacement can remove the workaround. Reusing this boot image with a different system/vendor build is outside the validated case.</li>
+</ul>
+<p>The useful outcome is a recoverable, evidence-backed operating configuration and a method others can test carefully. The next research steps are set out in the <a href="#chapter-7">research plan</a>.</p></section>
+<section id="chapter-3"><p class="chapter-meta">03 / 12 &nbsp; · &nbsp; <a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/docs/RECOVERY-RUNBOOK.md">Markdown source</a> &nbsp; · &nbsp; <a href="#contents">Contents</a></p><h1 id="chapter-3-heading-1">Pixel XL recovery runbook</h1>
+<details class="local-toc"><summary>In this chapter</summary><ul><li><a href="#chapter-3-heading-2">Intended use</a></li><li><a href="#chapter-3-heading-3">Prepare the host and an experiment directory</a></li><li><a href="#chapter-3-heading-4">Establish what mode is available</a></li><li><a href="#chapter-3-heading-5">Preserve evidence and the original boot</a></li><li><a href="#chapter-3-heading-6">Read the failure signature in context</a></li><li><a href="#chapter-3-heading-7">Build the rescue image only when the original matches</a></li><li><a href="#chapter-3-heading-8">Plan installation and rollback before writing</a></li><li><a href="#chapter-3-heading-9">Verify the rescue before proceeding</a></li><li><a href="#chapter-3-heading-10">Build and test the retained four-core variant</a></li><li><a href="#chapter-3-heading-11">Reboots and display transitions</a></li><li><a href="#chapter-3-heading-12">If something fails</a></li><li><a href="#chapter-3-heading-13">Finish with a reproducible record</a></li></ul></details>
+<h2 id="chapter-3-heading-2">Intended use</h2>
+<p>This sequence is for an owner or technician investigating a <code>marlin</code> Pixel XL with symptoms resembling the case study. Begin with identification and evidence. Advance only when the previous state is understood and a tested return path exists.</p>
+<p>The included binary builder supports one exact original boot hash. A different hash is a porting task, not an invitation to bypass validation. A matching hash still does not establish that another phone has the same defect.</p>
+<p>The owner in the case study accepted experimental recovery and already had an unlocked bootloader. Your data priorities may be different. Bootloader unlocking normally resets user data; changing lock state is outside this toolkit. Consult the <a href="https://source.android.com/docs/core/architecture/bootloader/locking_unlocking">AOSP bootloader-locking documentation</a> before considering it. Do not relock a device running an experimental boot image.</p>
+<h2 id="chapter-3-heading-3">Prepare the host and an experiment directory</h2>
+<p>Install Android SDK Platform Tools from <a href="https://developer.android.com/tools/releases/platform-tools">Google&#x27;s official distribution</a>. Verify that both <code>adb</code> and <code>fastboot</code> are available. The offline image builder additionally needs Python 3.9+ and LZ4; see the tool reference for exact requirements.</p>
+<p>Create a private directory outside the public project. Keep original images immutable, give every experiment a new directory, and record full hashes. Do not paste raw collections into a public issue: command lines, persistent logs, device identifiers, and application traces can expose information unrelated to the CPU problem.</p>
+<p>In all examples below, replace <code>SERIAL</code> with the selected device&#x27;s actual serial. Do not omit <code>-s</code> when more than one Android device might be attached.</p>
+<pre><code>adb devices -l
+fastboot devices</code></pre>
+<p>These commands inspect different transports. An Android device visible in ADB may disappear and reappear as a fastboot device during a requested reboot. An empty ADB list alone does not prove that the USB port or phone hardware is dead.</p>
+<h2 id="chapter-3-heading-4">Establish what mode is available</h2>
+<div class="table-wrap"><table><thead><tr>
+<th scope="col">Observation</th>
+<th scope="col">Next action</th>
+</tr></thead><tbody>
+<tr><td>ADB reports <code>device</code></td><td>Identify product, boot completion, privilege level, and installed build</td></tr>
+<tr><td>ADB reports <code>unauthorized</code></td><td>Resolve the device-side authorization prompt; this toolkit cannot approve it remotely</td></tr>
+<tr><td>Fastboot lists the device</td><td>Read product, active slot, and unlocked state before any write</td></tr>
+<tr><td>Recovery is available</td><td>Preserve pstore and the matching active boot image if root access permits</td></tr>
+<tr><td>Neither transport appears</td><td>Check cable/port and physical boot-mode entry; do not blindly loop flash commands</td></tr>
+</tbody></table></div>
+<p>For a connected Android or recovery shell:</p>
+<pre><code>adb -s SERIAL shell getprop ro.product.device
+adb -s SERIAL shell getprop ro.lineage.version
+adb -s SERIAL shell getprop ro.build.version.release
+adb -s SERIAL shell getprop ro.boot.slot_suffix
+adb -s SERIAL shell getprop sys.boot_completed
+adb -s SERIAL shell id</code></pre>
+<p>Product should be <code>marlin</code> for this kit. A fingerprint or marketing name alone is insufficient. Root is required for several kernel interfaces and partition backup. The collector will not silently enable it. On a compatible userdebug installation where the owner has enabled rooted debugging, an explicit <code>adb -s SERIAL root</code> can restart adbd with root privileges. Wait for reconnection and verify <code>id</code> again.</p>
+<h2 id="chapter-3-heading-5">Preserve evidence and the original boot</h2>
+<p>When root ADB is available, collect a private baseline:</p>
+<pre><code>python3 tools/collect.py \
+  --serial SERIAL \
+  --out ../private/baseline \
+  --include-pstore \
+  --backup-boot</code></pre>
+<p>The tool reads the active slot from Android, backs up that boot partition, and compares the downloaded SHA-256 with a hash computed on the device. It saves the slot and build observations in <code>backup.json</code>. It does not switch slots or flash anything.</p>
+<p>If root is unavailable, omit <code>--backup-boot</code> to collect whatever diagnostics are readable. Permission failures are recorded. A partial collection is not a substitute for a known matching boot image and recovery path.</p>
+<p>Preserve pstore early. A later reboot or deliberate shutdown can replace the evidence you wanted. In the case study, an intercepted restart yielded logs of the intercepted boot, not a definitive trace of the preceding failure. Never infer a panic simply because a reset occurred.</p>
+<p>Record at least:</p>
+<ul>
+<li>Product, ROM version, kernel release, active slot, and boot hash.</li>
+<li>Available transports and bootloader lock state.</li>
+<li>Online/present CPU lists, cluster frequency tables, and clock parents when readable.</li>
+<li>The count and timestamps of relevant PLL warnings in each captured buffer.</li>
+<li>Battery temperature, thermal-service status, and whether external power is connected.</li>
+<li>What the user observed physically and what the tools actually confirmed.</li>
+</ul>
+<p>Keep the original backup outside any build output directory. Hashes identify bytes; filenames such as <code>stock.img</code> or <code>fixed.img</code> do not.</p>
+<h2 id="chapter-3-heading-6">Read the failure signature in context</h2>
+<p>The investigated phone showed repeated <code>perfcl_pll</code> lock failures. Recovery could nevertheless run all four CPUs. A two-core Android boot worked, while adding a performance CPU with only a frequency cap still led to another restart.</p>
+<p>Look for that pattern, rather than treating every bootloop as equivalent. A bootloop caused by incompatible system/vendor partitions, missing storage, filesystem damage, or an application/framework problem may need a different investigation. An isolated early PLL warning is not enough: even the retained working image logged one during startup.</p>
+<p>Likewise, do not interpret normal <code>ramoops</code> initialization as an Oops. Read the whole line and surrounding timestamps. The included kernel-log summary lists heuristic candidates; it is not an automated hardware verdict.</p>
+<h2 id="chapter-3-heading-7">Build the rescue image only when the original matches</h2>
+<p>Inspect your backup and compare its hash with the profile:</p>
+<pre><code>python3 tools/inspect_boot.py ../private/baseline/boot-original.img</code></pre>
+<p>If it is the supported input, build a rescue image in a new output directory:</p>
+<pre><code>python3 tools/build_boot.py \
+  --boot ../private/baseline/boot-original.img \
+  --profile profiles/marlin-lineage22-case1.json \
+  --variant rescue \
+  --out ../private/rescue-build</code></pre>
+<p>The result changes only the header command line to request two CPUs. It preserves the original payload and the original header ID, matching the tested rescue bytes exactly. An unsupported hash causes refusal before a modified image is written.</p>
+<p>If the hash differs, stop this binary-reproduction path. Continue with the porting plan, obtain an image that actually belongs to the installation, or rebuild a suitable kernel from known source. Do not substitute the final case image for an unrelated ROM.</p>
+<h2 id="chapter-3-heading-8">Plan installation and rollback before writing</h2>
+<p>Enter fastboot deliberately, for example from responsive Android:</p>
+<pre><code>adb -s SERIAL reboot bootloader</code></pre>
+<p>If the device is unresponsive, physical Power/Volume Down entry may be necessary. Software cannot guarantee recovery from a device that no longer exposes a controllable transport.</p>
+<p>Read the bootloader state:</p>
+<pre><code>fastboot -s SERIAL getvar product
+fastboot -s SERIAL getvar current-slot
+fastboot -s SERIAL getvar unlocked</code></pre>
+<p>The toolkit&#x27;s planner validates the profiled files and makes read-only fastboot queries:</p>
+<pre><code>python3 tools/flash_plan.py \
+  --serial SERIAL \
+  --profile profiles/marlin-lineage22-case1.json \
+  --source-backup ../private/baseline/boot-original.img \
+  --image ../private/rescue-build/boot-rescue.img \
+  --rollback ../private/rescue-build/boot-rescue.img</code></pre>
+<p>For this first installation, the rescue image is a <strong>candidate</strong>, not yet a proven working rollback on your own device. Preserve the unmodified original separately; it restores the previous image bytes even if the previous behavior was a bootloop. Do not proceed to four-core experiments until the rescue candidate has actually booted and been checked on your device.</p>
+<p>The planner prints installation and rollback commands but executes neither. It verifies product, active slot, lock state, partition capacity, and image hashes. Fastboot cannot establish that a supplied backup still belongs to the currently installed system/vendor build; you must establish that from your own records. If the active slot or build changed since the backup, reconcile that change before writing.</p>
+<p>For an independently verified active slot <code>a</code>, the deliberate write would look like:</p>
+<pre><code>fastboot -s SERIAL flash boot_a ../private/rescue-build/boot-rescue.img
+fastboot -s SERIAL reboot</code></pre>
+<p>Use the actual verified slot, not <code>a</code> copied from this example. Do not flash both slots as a precaution. Do not switch slots merely because one failed. A/B slots contain related software components, and changing only one component or selecting an incompatible slot can create a different failure. The <a href="https://source.android.com/docs/core/ota/ab/ab_implement">AOSP A/B implementation documentation</a> explains the slot model.</p>
+<p>Do not assume <code>fastboot boot</code> will work. On the case device it rejected the original image too. That observation is specific to this device/bootloader/image combination, not a general statement that Pixel XL can never temporarily boot an image.</p>
+<h2 id="chapter-3-heading-9">Verify the rescue before proceeding</h2>
+<p>A successful flash command only means the bootloader accepted the write. After Android starts:</p>
+<ol>
+<li>Confirm <code>sys.boot_completed=1</code> and the expected product/build.</li>
+<li>Re-establish authorized root ADB if needed.</li>
+<li>Hash the active boot partition and compare it with the image just installed.</li>
+<li>Read <code>/proc/cmdline</code>, CPU <code>present</code> and <code>online</code>, and actual frequency tables.</li>
+<li>Capture dmesg and any available pstore before further reboots.</li>
+<li>Run a short, correctness-checked workload on the CPUs that are actually available.</li>
+</ol>
+<p>Example for a verified two-core rescue:</p>
+<pre><code>python3 tools/soak.py \
+  --serial SERIAL \
+  --expected-boot-sha256 7c6f9d632f45f5b5000e541cef5ae17b48b496e6d9135e5058578da0748cd8e8 \
+  --cores 0,1 \
+  --seconds-per-phase 30 \
+  --out ../private/rescue-load</code></pre>
+<p>The tool assumes the tested battery temperature interface uses tenths of a degree Celsius and that <code>vendor.thermal-engine</code> is running. If your ROM differs, inspect it and port the test rather than defeating its checks.</p>
+<p>With a two-core boot restriction, inspect cpusets before attributing every performance problem to damaged silicon. Do not run the private case&#x27;s old cpuset-adjustment script on a four-core phone. The public toolkit does not ship that device-specific mutation script.</p>
+<h2 id="chapter-3-heading-10">Build and test the retained four-core variant</h2>
+<p>Once rescue is verified, reproduce the stable case image from the same unmodified original input:</p>
+<pre><code>python3 tools/build_boot.py \
+  --boot ../private/baseline/boot-original.img \
+  --profile profiles/marlin-lineage22-case1.json \
+  --variant stable \
+  --out ../private/stable-build</code></pre>
+<p>Re-enter fastboot and generate a plan that pairs this candidate with the <strong>now-tested</strong> rescue image:</p>
+<pre><code>python3 tools/flash_plan.py \
+  --serial SERIAL \
+  --profile profiles/marlin-lineage22-case1.json \
+  --source-backup ../private/baseline/boot-original.img \
+  --image ../private/stable-build/boot-stable.img \
+  --rollback ../private/rescue-build/boot-rescue.img</code></pre>
+<p>After an intentional installation and normal boot, check the installed hash and runtime parameters before load. The expected stable hash is <code>4635c2c76c37ff34259bfdc15d7e430c95cbc24cfd85cd864b877f0a21d2ccee</code>.</p>
+<p>Read both the configuration flags and actual parent selection. A command-line option alone does not prove that the running clock uses it. Check the clock parents and <code>cpuinfo_max_freq</code> for both clusters. Expect CPU0/1 at most 1,593,600 kHz and CPU2/3 at most 902,400 kHz on the case variant.</p>
+<p>Start with short pinned checks, then increase the duration if the phone stays responsive and results are correct:</p>
+<pre><code>python3 tools/soak.py \
+  --serial SERIAL \
+  --expected-boot-sha256 4635c2c76c37ff34259bfdc15d7e430c95cbc24cfd85cd864b877f0a21d2ccee \
+  --cores 0,1,2,3 \
+  --seconds-per-phase 300 \
+  --max-freq0-khz 1593600 \
+  --max-freq2-khz 902400 \
+  --out ../private/four-core-load</code></pre>
+<p>This requests two five-minute phases. It computes expected digests on the host, verifies data copied to the phone, pins a worker to each selected CPU, monitors continuity and temperature, and records the kernel log. It does not force frequency minimums or change thermal settings.</p>
+<p>The 40 °C battery cutoff is a conservative experiment policy, not the phone&#x27;s specified maximum operating temperature. A temperature stop means the test stopped under that policy; it is not proof of a defective CPU. Let the device cool and understand its power/charging conditions before deciding on another test.</p>
+<h2 id="chapter-3-heading-11">Reboots and display transitions</h2>
+<p>After successful load tests, verify persistence through a few deliberate normal reboots. For each one, record the old boot identity, request <code>adb -s SERIAL reboot</code>, wait for Android, obtain root only through the device&#x27;s authorized mechanism, and verify the new identity, image hash, online CPUs, limits, parents, and log. Stop if the device fails to return rather than issuing further dependent steps.</p>
+<p>Display checks can use <code>input keyevent KEYCODE_SLEEP</code> and <code>KEYCODE_WAKEUP</code>, with <code>dumpsys power</code> to record the resulting state. In the case, the states were <code>Dozing</code> and <code>Awake</code>. Do not call this a deep-suspend test. The original command line already disabled a low-power sleep setting, and USB connection itself can affect power behavior.</p>
+<p>Follow the reboots with a short load run using a <strong>new</strong> output directory. A configuration that worked before a reboot is not automatically proven to have survived it unchanged.</p>
+<h2 id="chapter-3-heading-12">If something fails</h2>
+<p>Preserve the private worker logs and kernel stream first. Identify whether the failure was a wrong checksum, an unexpected reset, a transport failure, a temperature stop, or a test-harness parsing problem. Those are different observations.</p>
+<p>If the device returns in ADB, it may be possible to capture logs and enter fastboot before another reset. If fastboot is already available, use the previously prepared rollback command for the verified active slot. If neither transport is available, physical button entry may be required. The toolkit does not promise unattended recovery from every hang.</p>
+<p>Restore the known-working rescue image, boot, and verify its hash and CPU restriction. Do not escalate to higher clocks, disable protection, change random voltages, or switch slots while the preceding failure is unexplained.</p>
+<h2 id="chapter-3-heading-13">Finish with a reproducible record</h2>
+<p>Record the selected image hash, preserved original, tested rollback, exact ROM observations, test durations and counts, maximum sampled temperature, and remaining limitations. An image should not be described as permanently repaired on the basis of a few successful boots.</p>
+<p>To share bounded test metrics without raw device output:</p>
+<pre><code>python3 tools/export_summary.py \
+  --run ../private/four-core-load \
+  --out ../public-load-summary.json</code></pre>
+<p>Review the small JSON file and fill out the community report template. Keep private source images and complete logs available locally so the result can be investigated later without making unrelated device data public.</p></section>
+<section id="chapter-4"><p class="chapter-meta">04 / 12 &nbsp; · &nbsp; <a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/docs/IMPLEMENTATION.md">Markdown source</a> &nbsp; · &nbsp; <a href="#contents">Contents</a></p><h1 id="chapter-4-heading-1">Boot image implementation</h1>
+<details class="local-toc"><summary>In this chapter</summary><ul><li><a href="#chapter-4-heading-2">Two outputs from one original</a></li><li><a href="#chapter-4-heading-3">Observed legacy layout</a></li><li><a href="#chapter-4-heading-4">Command line and legacy ID</a></li><li><a href="#chapter-4-heading-5">Kernel decompression and offset validation</a></li><li><a href="#chapter-4-heading-6">Device-tree caps</a></li><li><a href="#chapter-4-heading-7">Repacking and independent verification</a></li><li><a href="#chapter-4-heading-8">Runtime checks that static image checks cannot replace</a></li><li><a href="#chapter-4-heading-9">Why a clean source implementation is still useful</a></li></ul></details>
+<h2 id="chapter-4-heading-2">Two outputs from one original</h2>
+<p>The public builder reproduces the rescue and retained four-core images directly from the unmodified original. It does not reproduce every intermediate experiment. Intermediate hashes remain in the evidence ledger so a reader can distinguish which result belongs to which image.</p>
+<p>The two supported variants are:</p>
+<ul>
+<li><code>rescue</code>: append <code>nr_cpus=2 maxcpus=2</code>; preserve all payload bytes and the original legacy header ID.</li>
+<li><code>stable</code>: patch the two alternate-PLL divider fields, cap both cluster frequency tables, add the four-core alternate-PLL options, recompress and repack, and recompute the legacy header ID.</li>
+</ul>
+<p>The builder checks the complete input hash before interpreting the profile&#x27;s raw kernel offsets. It then checks the decompressed kernel hash, field-adjacent constants, number of changed bytes, patched raw hash, compression roundtrip, device-tree structure, unrelated properties, ramdisk identity, and complete output hash. The output hash is the final gate before writing the candidate file.</p>
+<h2 id="chapter-4-heading-3">Observed legacy layout</h2>
+<div class="table-wrap"><table><thead><tr>
+<th scope="col">Field</th>
+<th scope="col">Original image</th>
+<th scope="col">Retained image</th>
+</tr></thead><tbody>
+<tr><td>Total image bytes</td><td>33,554,432</td><td>33,554,432</td></tr>
+<tr><td>Header version</td><td>0</td><td>0</td></tr>
+<tr><td>Page size</td><td>4,096</td><td>4,096</td></tr>
+<tr><td>Kernel payload bytes</td><td>21,889,992</td><td>21,845,692</td></tr>
+<tr><td>Ramdisk bytes</td><td>9,274,872</td><td>9,274,872</td></tr>
+<tr><td>Ramdisk offset</td><td>21,897,216</td><td>21,852,160</td></tr>
+<tr><td>Appended DTB count</td><td>20</td><td>20</td></tr>
+<tr><td>Second-stage payload</td><td>Empty</td><td>Empty</td></tr>
+</tbody></table></div>
+<p>The kernel-size field includes the compressed kernel frame and the appended DTBs. The ramdisk starts after page-aligning that combined payload. The remaining partition-dump trailer was all zeros. This observation allowed the case-specific repack; it is not a license to discard nonzero trailers in other images.</p>
+<p>The reader rejects other header versions, unsupported second-stage payloads, nonzero padding, nonzero trailers, invalid sizes, and out-of-bounds data. It is not an AVB or boot-signature tool. The <a href="https://source.android.com/docs/core/architecture/bootloader/boot-image-header">AOSP boot-image header reference</a> is the format reference; this implementation intentionally handles only a subset.</p>
+<h2 id="chapter-4-heading-4">Command line and legacy ID</h2>
+<p>The original primary command-line field contained the board and boot-device arguments and <code>lpm_levels.sleep_disabled=1</code>. Its extra command-line field was empty. The toolkit preserves the existing primary arguments, requires the added text to fit the primary 512-byte field, and retains an empty extra field.</p>
+<p>The original stored legacy ID did not equal the SHA-1 recomputed from its payloads. The investigation did not determine why. The rescue output preserves it exactly because only the command line changed and the successful rescue image is the reference result.</p>
+<p>For the stable repack, the SHA-1 input consists of kernel bytes plus their little-endian length, ramdisk bytes plus their length, and the empty second-stage payload plus its zero length. The digest is stored with the remaining ID bytes padded with zero. Recomputing this legacy field is not signing the image and does not make it acceptable to a locked verified-boot chain.</p>
+<h2 id="chapter-4-heading-5">Kernel decompression and offset validation</h2>
+<p>The original LZ4 frame occupied 13,470,216 bytes at the start of the kernel payload. Its first seven bytes were:</p>
+<pre><code>04 22 4d 18 64 70 b9</code></pre>
+<p>Decompression produced a 29,104,160-byte ARM64 Image. The public profile records these hashes:</p>
+<pre><code>Original raw kernel
+b604388da1159bfe628c7456d19f30eec1f977acd517a56e1193965c34c718b9
+
+Patched raw kernel
+060e28dee64a273399c292770efdb4bf7c0517d0af98eb112a64df8b2e84a44f</code></pre>
+<p>Live symbols observed during the private experiment located the two alternate-PLL structures relative to <code>_text</code>. The offsets below apply only to that validated Image:</p>
+<div class="table-wrap"><table><thead><tr>
+<th scope="col">Structure</th>
+<th scope="col">Structure offset</th>
+<th scope="col">Field offset</th>
+<th scope="col">Old value</th>
+<th scope="col">New value</th>
+</tr></thead><tbody>
+<tr><td><code>pwrcl_alt_pll</code></td><td>28,305,168</td><td>28,305,200</td><td>256</td><td>0</td></tr>
+<tr><td><code>perfcl_alt_pll</code></td><td>28,305,776</td><td>28,305,808</td><td>256</td><td>0</td></tr>
+</tbody></table></div>
+<p>The field was at structure offset +32. Three adjacent 32-bit little-endian values were checked as <code>(9, 256, 0x4001051b)</code> before each write. This is an additional consistency check after the full image hashes, not a signature search that makes arbitrary kernels compatible.</p>
+<p>Exactly two bytes differ between the original and patched raw images. All other bytes, including the instruction bytes, remain equal. Recompression changes many bytes of the compressed representation, so “two-byte kernel data patch” must not be shortened to “only two bytes in boot.img changed.”</p>
+<p>Do not paste these offsets into a hex editor for another kernel. Compiler, configuration, link layout, source changes, and even unrelated data can move the structures. A port needs evidence for its own layout or, preferably, a controlled source build.</p>
+<h2 id="chapter-4-heading-6">Device-tree caps</h2>
+<p>The parser walks the FDT structure tokens and string table. It identifies <code>qcom,pwrcl-speedbin*-v0</code> and <code>qcom,perfcl-speedbin*-v0</code> properties, each containing frequency/voltage-corner pairs. For the retained case, it keeps frequencies at or below 1,593,600,000 Hz for <code>pwrcl</code> and 902,400,000 Hz for <code>perfcl</code>.</p>
+<p>The actual DTB may use a lower supported step: some variants retain 883.2 MHz in the performance table. The cap is an upper bound, not an invented operating point. The runtime table on the case phone was separately checked.</p>
+<p>Removed pairs are replaced with FDT NOP tokens after shortening the property length. Each DTB keeps its original total size. The parser then verifies that the set of property names is unchanged and that every unrelated property value is identical. Retained voltage-corner values are copied exactly.</p>
+<p>There are three tables per cluster in each of twenty DTBs, so the final transformation handles 120 tables. The profile records the original DTB offsets and sizes; the builder checks that the sequence is contiguous and accounts for the entire tail of the kernel payload.</p>
+<p>During the original campaign, independent upstream <code>libfdt</code> tooling checked the 60 performance tables and, later, the 60 efficient tables. The public builder&#x27;s own parser is supplemented by tests and by the final byte-for-byte output hash. For an independent port, use another parser such as <code>fdtget</code> as well; two implementations agreeing is more informative than one implementation reading its own output.</p>
+<h2 id="chapter-4-heading-7">Repacking and independent verification</h2>
+<p>The modified raw kernel was compressed using:</p>
+<pre><code>lz4 -12 -B7 -f Image.patched kernel.patched.lz4</code></pre>
+<p>The builder decompresses that result and compares all bytes with the intended raw image. It also checks the frame header. The capped DTB tail is appended, the new kernel size is written, and the unchanged ramdisk is placed at the new aligned offset.</p>
+<p>The result is padded to the original 32 MiB partition-dump size and its legacy ID recomputed. An independent AOSP unpacker was used during the device campaign. The public package does not redistribute that script; its upstream source is linked in <a href="#chapter-8">References</a>.</p>
+<p>LZ4 output can depend on implementation/version choices. The public builder therefore refuses to write a final image if the complete SHA-256 differs from the validated result, even if a decompression roundtrip passed. Use the recorded tool version or investigate the difference explicitly. Removing the final hash check would change the scope of the tool.</p>
+<h2 id="chapter-4-heading-8">Runtime checks that static image checks cannot replace</h2>
+<p>An image can be structurally valid and still fail on a phone. The campaign separately checked the installed partition hash, boot completion, CPU availability, actual mux parents, module options, frequency tables, hardware clock measurements under load, correctness workloads, display transitions, and repeated boots.</p>
+<p>Reported <code>scaling_cur_freq</code> and clock <code>rate</code> values were insufficient to detect the initial divide-by-two behavior. The debug clock <code>measure</code> interface exposed the difference under load. Conversely, a low measurement while idle was not treated as evidence of a broken frequency setting.</p>
+<p>The public soak tool does not modify frequency minimums to perform clock measurements. If a researcher does so manually, record the original settings first, use only supported values, restore them reliably, and continue to respect thermal restrictions. The original campaign restored both cluster minimums to 307,200 kHz.</p>
+<h2 id="chapter-4-heading-9">Why a clean source implementation is still useful</h2>
+<p>The binary method made a small, auditable intervention possible when the exact compiled source provenance was unknown. A source-built implementation could express the workaround as a deliberate configuration option, document its constraints, and avoid per-build data offsets.</p>
+<p>That does not automatically make a rebuilt kernel equivalent. A proper source experiment needs a control build, matching configuration/toolchain, boot and ramdisk compatibility checks, and the same runtime validation. The <a href="#chapter-7">research plan</a> describes that next step without claiming it has already been completed.</p></section>
+<section id="chapter-5"><p class="chapter-meta">05 / 12 &nbsp; · &nbsp; <a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/docs/VALIDATION.md">Markdown source</a> &nbsp; · &nbsp; <a href="#contents">Contents</a></p><h1 id="chapter-5-heading-1">Validation methodology and evidence map</h1>
+<details class="local-toc"><summary>In this chapter</summary><ul><li><a href="#chapter-5-heading-2">Three different questions</a></li><li><a href="#chapter-5-heading-3">Evidence inventory</a></li><li><a href="#chapter-5-heading-4">Load generation and counting</a></li><li><a href="#chapter-5-heading-5">Clock and continuity checks</a></li><li><a href="#chapter-5-heading-6">Floating-point workload</a></li><li><a href="#chapter-5-heading-7">Lifecycle checks</a></li><li><a href="#chapter-5-heading-8">Kernel logs and the reviewed false alarm</a></li><li><a href="#chapter-5-heading-9">What remains untested</a></li></ul></details>
+<h2 id="chapter-5-heading-2">Three different questions</h2>
+<p>This project keeps three kinds of validation separate:</p>
+<ol>
+<li><strong>Image correctness:</strong> did a transformation produce the intended bytes without changing unrelated payloads?</li>
+<li><strong>Device behavior:</strong> did the installed configuration boot, select the intended clocks, and execute the recorded workloads correctly?</li>
+<li><strong>Tool correctness:</strong> do the newly packaged scripts parse, refuse, record, and clean up as intended in their tested paths?</li>
+</ol>
+<p>Exact image hashes answer the first question. Original phone logs and results answer a bounded part of the second. Host tests, including simulated transport, answer part of the third. None is a substitute for the others.</p>
+<h2 id="chapter-5-heading-3">Evidence inventory</h2>
+<div class="table-wrap"><table><thead><tr>
+<th scope="col">Artifact</th>
+<th scope="col">What it preserves</th>
+<th scope="col">What it does not establish</th>
+</tr></thead><tbody>
+<tr><td><a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/evidence/validation-summary.json">validation-summary.json</a></td><td>Selected image, aggregate counts, durations, maximum sampled temperatures, lifecycle totals</td><td>Long-term reliability or a second device</td></tr>
+<tr><td><a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/evidence/E07-soak.json">E07-soak.json</a></td><td>Predecessor image&#x27;s two load phases and selected telemetry</td><td>Evidence that E07 had the final efficient-cluster DT cap</td></tr>
+<tr><td><a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/evidence/E08-soak.json">E08-soak.json</a></td><td>Final image&#x27;s main test, measured clocks, telemetry, and false-alarm review note</td><td>An untouched automatically passing first result</td></tr>
+<tr><td><a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/evidence/E08-post-reboot.json">E08-post-reboot.json</a></td><td>Shorter final-image load after lifecycle checks</td><td>Additional ten-minute load</td></tr>
+<tr><td><a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/evidence/lifecycle.json">lifecycle.json</a></td><td>Ten display transitions, three normal reboots, selected post-boot observations</td><td>Deep suspend, power-off cold starts, or standby drain</td></tr>
+<tr><td><a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/evidence/floating-point.json">floating-point.json</a></td><td>Per-core numerical errors and iteration counts</td><td>Exhaustive instruction/FPU/SIMD validation</td></tr>
+<tr><td><a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/evidence/pll-log-excerpts.txt">pll-log-excerpts.txt</a></td><td>Relevant initial, failed-experiment, and retained-boot warning excerpts/counts</td><td>A captured conclusive panic or full private log</td></tr>
+<tr><td><a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/evidence/image-ledger.json">image-ledger.json</a></td><td>Image basenames, sizes, and hashes</td><td>Permission to use them with a different system build</td></tr>
+<tr><td><a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/evidence/source-references.json">source-references.json</a></td><td>Pinned reference-file hashes and match observations</td><td>Exact compiled-ROM source provenance</td></tr>
+<tr><td><a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/evidence/tool-tests.txt">tool-tests.txt</a></td><td>Public host-suite transcript and scope</td><td>Public wrapper hardware validation</td></tr>
+</tbody></table></div>
+<p>The public evidence was selected from private originals. Serial numbers, host home directories, boot UUIDs, and unrelated raw log contents were omitted. Boot continuity is represented as a reviewed boolean and lifecycle identity changes as a count. Original private records remain the primary local audit trail; the sanitized selection is not a cryptographically authenticated independent laboratory report.</p>
+<h2 id="chapter-5-heading-4">Load generation and counting</h2>
+<p>The original main runs used a 32 MiB input. One half was deterministic pseudorandom data and one half repeating byte values, so compression did useful work without making the entire input either trivially compressible or incompressible. Expected SHA-256 and SHA-512 values came from the host. Uploaded input was verified before load.</p>
+<p>Four workers were pinned concurrently, one per CPU. Each hash iteration checked both expected digests. Each mixed iteration added a gzip compress/decompress roundtrip and a SHA-256 comparison of the recovered bytes. Thus:</p>
+<pre><code>hash checks  = 2 × sum(per-core hash iterations)
+mixed checks = 3 × sum(per-core mixed iterations)</code></pre>
+<div class="table-wrap"><table><thead><tr>
+<th scope="col">Run</th>
+<th scope="col">Hash iterations CPU0/1/2/3</th>
+<th scope="col">Mixed iterations CPU0/1/2/3</th>
+<th scope="col">Total checks</th>
+<th scope="col">Harness elapsed</th>
+<th scope="col">Max sampled battery</th>
+</tr></thead><tbody>
+<tr><td>E07</td><td>725 / 723 / 433 / 405</td><td>115 / 116 / 81 / 75</td><td>5,733</td><td>610.83 s</td><td>38.2 °C</td></tr>
+<tr><td>E08 main</td><td>742 / 754 / 464 / 470</td><td>115 / 116 / 82 / 84</td><td>6,051</td><td>616.83 s</td><td>39.0 °C</td></tr>
+<tr><td>E08 post-reboot</td><td>146 / 146 / 93 / 94</td><td>23 / 24 / 17 / 17</td><td>1,201</td><td>132.44 s</td><td>37.0 °C</td></tr>
+</tbody></table></div>
+<p>The selected image&#x27;s two runs total <strong>7,252 checks and 749.27 seconds of harness time</strong>. Their requested phase durations total approximately twelve minutes of load; process startup, monitoring, and completion account for additional elapsed time. E07&#x27;s 5,733 checks belong to a predecessor image and are not added to the final image&#x27;s total.</p>
+<p>Iterations are deterministic repeated workloads, not independent statistical trials over all possible faults. Repeated correct results provide useful evidence for these paths but do not yield a defensible universal failure probability.</p>
+<h2 id="chapter-5-heading-5">Clock and continuity checks</h2>
+<p>The original harness compared the installed active-boot SHA-256 to the intended candidate before exercising it. It recorded boot identities to detect unnoticed restarts and sampled online CPUs, frequencies, temperature, thermal-service state, and CPU accounting. E08 main work intervals showed approximately 99.8–100% CPU busy time in the sampled accounting.</p>
+<p>Reported frequency was checked separately from hardware clock measurement. Before the divider correction, a reported 1,593.6 MHz corresponded to about 796.8 MHz, and a reported 902.4 MHz to about 451.2 MHz. After correction, measurements under load agreed closely with requested rates. The main E08 record contains 1,593,608,048 Hz and 902,407,456 Hz hardware measurements for 1,593,600,000 Hz and 902,400,000 Hz reported rates.</p>
+<p>Small measurement differences do not imply an overclock to the last recorded digit. These values are debug clock-counter observations. Idle clock gating can also produce much smaller readings. A future report should include the workload and measurement context rather than a lone frequency number.</p>
+<p>The private measurement procedure briefly requested existing permitted minimum frequencies and restored both clusters to 307,200 kHz afterwards. It also temporarily relaxed <code>kptr_restrict</code> to read symbols, then restored it to 2. The public soak script does neither operation. Its cpufreq guards alone cannot detect a repeated divide-by-two reporting issue.</p>
+<h2 id="chapter-5-heading-6">Floating-point workload</h2>
+<p>The preserved <a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/tools/floating_point.awk">AWK source</a> computes, for <code>i=1..200000</code> and <code>x=i/1024</code>:</p>
+<div class="table-wrap"><table><thead><tr>
+<th scope="col">Quantity</th>
+<th scope="col">Recorded maximum on every core</th>
+<th scope="col">Allowed threshold</th>
+</tr></thead><tbody>
+<tr><td>Absolute <code>sqrt(x)^2 - x</code></td><td>2.842170943040401e-14</td><td>1e-9</td></tr>
+<tr><td>Absolute <code>sin(x)^2 + cos(x)^2 - 1</code></td><td>2.220446049250313e-16</td><td>1e-12</td></tr>
+<tr><td>Absolute <code>exp(log(1+x)) - (1+x)</code></td><td>8.526512829121202e-14</td><td>1e-9</td></tr>
+<tr><td>Sum of <code>sin(x)^2 + cos(x)^2</code></td><td>200000</td><td>Within 1e-5 of 200000</td></tr>
+</tbody></table></div>
+<p>The original controller checked each exit status and output, and boot identity/online CPUs before and after. Four cores completed 200,000 iterations each, for 800,000 total. These are identity-based numerical checks using the installed AWK/libm implementation. They do not compare every operation against an independently computed high-precision reference, and common-mode numerical errors are possible.</p>
+<h2 id="chapter-5-heading-7">Lifecycle checks</h2>
+<p>Ten screen cycles recorded <code>mWakefulness=Dozing</code> followed by <code>mWakefulness=Awake</code>. Three requested normal reboots produced three distinct boot identities; the original harness also checked the installed image hash, all four CPUs, clock parents, and limits on return. The sanitized lifecycle file contains selected observations rather than the complete original snapshots.</p>
+<p>Normal reboot validation does not test a cold power-on from a fully powered-off state. Dozing/Awake validation does not establish low-power CPU suspend. The inherited sleep-disabling command-line option makes that distinction especially relevant here.</p>
+<h2 id="chapter-5-heading-8">Kernel logs and the reviewed false alarm</h2>
+<p>The campaign preserved live and final dmesg, worker outputs, and result JSON. The main E08 workload completed correctly, but an overly broad <code>Oops:</code> expression matched normal <code>ramoops: attached</code> initialization. The original failed result was preserved, the matched context was reviewed, the detector was corrected, and the logs were checked again. The amended result explicitly states why the initial verdict changed.</p>
+<p>One early <code>perfcl_pll</code> warning persisted on final boots. A report saying “zero PLL warnings” would be inaccurate. The meaningful change was the absence of the repeated lock-failure sequence during successful operation. The captured original and E02 warnings support clock-path investigation without proving the exact physical reset mechanism.</p>
+<p>Log matching remains heuristic. Correct word boundaries eliminate this particular false positive; they do not turn all kernel text into a perfect health signal. A ring buffer may overwrite old lines, pstore may refer to a different boot, and a disconnected stream may lose evidence. Preserve collection status and timestamps alongside the lines.</p>
+<h2 id="chapter-5-heading-9">What remains untested</h2>
+<p>No claim is made about all-memory coverage, uncorrected memory errors, storage endurance, GPU stability, camera/radio stress, deep suspend, days of operation, battery state of health, or maximum stable frequency. No controlled source-rebuilt baseline and no second physical device were part of this case.</p>
+<p>The original workloads actually ran on the phone. The public refactor&#x27;s image outputs were actually rebuilt byte-for-byte. Its ADB control paths were host-tested with simulated devices; they await their own hardware validation. Keeping these statements separate is necessary for an honest reproduction report.</p></section>
+<section id="chapter-6"><p class="chapter-meta">06 / 12 &nbsp; · &nbsp; <a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/docs/TOOLS.md">Markdown source</a> &nbsp; · &nbsp; <a href="#contents">Contents</a></p><h1 id="chapter-6-heading-1">Tool reference</h1>
+<details class="local-toc"><summary>In this chapter</summary><ul><li><a href="#chapter-6-heading-2">Environment and verification scope</a></li><li><a href="#chapter-6-heading-3"><code>inspect_boot.py</code>: inspect a raw legacy boot image</a></li><li><a href="#chapter-6-heading-4"><code>build_boot.py</code>: reproduce a profiled image offline</a></li><li><a href="#chapter-6-heading-5"><code>collect.py</code>: private read-only device collection</a></li><li><a href="#chapter-6-heading-6"><code>flash_plan.py</code>: validate inputs and print a plan</a></li><li><a href="#chapter-6-heading-7"><code>soak.py</code>: bounded correctness workloads</a></li><li><a href="#chapter-6-heading-9"><code>floating_point.awk</code>: the numerical workload used in the case</a></li><li><a href="#chapter-6-heading-10"><code>export_summary.py</code>: allowlist export</a></li><li><a href="#chapter-6-heading-11">Host tests</a></li><li><a href="#chapter-6-heading-12">Rebuild the offline reader</a></li></ul></details>
+<h2 id="chapter-6-heading-2">Environment and verification scope</h2>
+<p>The host tools use Python 3.9+ and its standard library. Invoke them with <code>python3</code> from the project root. The device tools additionally need Google&#x27;s <code>adb</code> or <code>fastboot</code> on PATH; each accepts an explicit executable path. The stable image builder needs the LZ4 command-line utility. Exact image reconstruction was verified with LZ4 1.10.0 on macOS.</p>
+<p>Linux is an intended host target, but was not exercised in this packaging session. Windows-specific transport, quoting, and terminal behavior have not been validated. The planner prints POSIX shell commands; do not assume that its quoting is appropriate for PowerShell or cmd.exe.</p>
+<p>All device commands require an explicit <code>--serial</code>. The collector and soak tool require Android/recovery to report <code>ro.product.device=marlin</code>. ADB root must already be available for boot backup and soak. The tools do not enable root, grant authorization, unlock a bootloader, change slots, or choose a device implicitly.</p>
+<p>The original hardware campaign used private scripts. The public refactor has host tests and exact image-reconstruction checks, but its new ADB collection and load wrappers were not rerun on a phone during packaging. A packaging smoke attempt stopped at “device not found.” Do not confuse the supplied historical device results with a hardware certification of the public wrappers.</p>
+<h2 id="chapter-6-heading-3"><code>inspect_boot.py</code>: inspect a raw legacy boot image</h2>
+<pre><code>python3 tools/inspect_boot.py ../private/boot-original.img</code></pre>
+<p>Outputs JSON with the complete hash, payload sizes and offsets, command line, stored legacy ID, and whether the ID matches a fresh calculation. It reads only the named host file.</p>
+<p>The underlying parser accepts a narrow legacy header-v0 layout with supported page alignment, an empty second-stage payload, zero padding, and a zero trailer. It rejects modern headers and unexplained nonzero trailing data. This strictness is intentional: an unrecognized footer may be meaningful. Inspection does not establish that an image belongs to the connected phone or will boot.</p>
+<h2 id="chapter-6-heading-4"><code>build_boot.py</code>: reproduce a profiled image offline</h2>
+<p>Required arguments are <code>--boot</code>, <code>--profile</code>, <code>--variant rescue|stable</code>, and <code>--out</code>. Optional <code>--lz4</code> selects a particular executable. The output directory must not already exist.</p>
+<pre><code>python3 tools/build_boot.py \
+  --boot ../private/boot-original.img \
+  --profile profiles/marlin-lineage22-case1.json \
+  --variant stable \
+  --lz4 /path/to/lz4 \
+  --out ../private/stable-build</code></pre>
+<p>Omit <code>--lz4</code> when the intended executable is on PATH. The rescue variant does not need LZ4. Both variants start from the same unmodified original, rather than layering changes onto a previously patched image.</p>
+<p>The builder writes <code>boot-rescue.img</code> or <code>boot-stable.img</code> and a <code>manifest.json</code>. The manifest records hashes, variant, parser observations, and transformation details; the stable manifest also records LZ4 version and DT changes. Temporary decompression files are created in the host&#x27;s temporary directory and removed when the build context exits normally or with an exception.</p>
+<p>The full source hash is checked before raw kernel offsets are used. The complete output hash must match the selected case variant before the output directory and image are written. An unexpected compression output, changed profile, altered source byte, or incompatible layout causes refusal. An externally killed process can still leave temporary host files or a partial output directory; use a new directory after reviewing what happened.</p>
+<p>There is no ADB or fastboot invocation in the builder. A successful build proves the byte transformation, not a successful boot on another phone. See <a href="#chapter-4">Implementation</a> for the exact checks and the source image&#x27;s unusual legacy ID.</p>
+<h2 id="chapter-6-heading-5"><code>collect.py</code>: private read-only device collection</h2>
+<pre><code>python3 tools/collect.py \
+  --serial SERIAL \
+  --out ../private/collection-01 \
+  --include-pstore \
+  --backup-boot</code></pre>
+<div class="table-wrap"><table><thead><tr>
+<th scope="col">Argument</th>
+<th scope="col">Meaning</th>
+</tr></thead><tbody>
+<tr><td><code>--serial</code></td><td>Required exact device selection</td></tr>
+<tr><td><code>--out</code></td><td>Required new local directory</td></tr>
+<tr><td><code>--adb</code></td><td>Optional ADB executable, default <code>adb</code></td></tr>
+<tr><td><code>--include-pstore</code></td><td>Read <code>console-ramoops-0</code> if available</td></tr>
+<tr><td><code>--backup-boot</code></td><td>Root-required read of the active slot&#x27;s boot partition</td></tr>
+</tbody></table></div>
+<p>Collection includes selected build properties, kernel release, boot options, CPU lists, cpufreq tables, relevant clock options/parents, battery/BMS interfaces, thermal-service state, cpusets, and dmesg. It does not request a full Android bugreport, application databases, screenshots, or all properties. Nevertheless, raw kernel and battery output can contain private identifiers.</p>
+<p>The pstore option reads the console record, not the Android persistent-message buffer. Unavailable files or non-root dmesg access can yield a partial collection. Capture return codes are in the journal. A final “saved” message means the collected outputs were saved, not that every requested field was readable.</p>
+<p>With <code>--backup-boot</code>, the tool reads <code>ro.boot.slot_suffix</code>, permits only <code>a</code> or <code>b</code>, downloads <code>/dev/block/by-name/boot_&lt;slot&gt;</code>, checks a reasonable byte-size bound, and compares the host SHA-256 with the device SHA-256. It writes <code>boot-original.img</code> and <code>backup.json</code> only after that comparison. The filename means “original to this collection”; it may already be a modified image. Identify it by hash and record its actual history.</p>
+<p>Selected shell queries use bounded subprocess timeouts: typically 15 seconds, 30 seconds for log captures, and 60 seconds for boot backup. A host timeout does not prove a hardware failure. Read-only access can still wake the phone and affect power observations.</p>
+<h2 id="chapter-6-heading-6"><code>flash_plan.py</code>: validate inputs and print a plan</h2>
+<pre><code>python3 tools/flash_plan.py \
+  --serial SERIAL \
+  --profile profiles/marlin-lineage22-case1.json \
+  --source-backup ../private/boot-original.img \
+  --image ../private/stable-build/boot-stable.img \
+  --rollback ../private/rescue-build/boot-rescue.img</code></pre>
+<p>Optional <code>--fastboot</code> selects an executable. The phone must already be in fastboot. The script checks the profiled original, candidate and rescue hashes and sizes, then queries product, current slot, unlocked state, and the selected boot partition&#x27;s size. It accepts the bootloader&#x27;s usual stderr output for <code>getvar</code>.</p>
+<p>The JSON output contains quoted installation, reboot, and rollback commands. <strong>No flash or reboot command is executed.</strong> The planner does not create a backup, test the rollback, establish system/vendor compatibility, or confirm the ownership history of a supplied image. Its JSON explicitly identifies the installation-match condition that fastboot variables cannot prove.</p>
+<p>On the first rescue installation, <code>--image</code> and <code>--rollback</code> may name the same rescue candidate. That does not make it a tested fallback on a new phone. Keep the untouched original and establish that rescue actually works before advancing to the four-core candidate. The runbook describes this sequence.</p>
+<h2 id="chapter-6-heading-7"><code>soak.py</code>: bounded correctness workloads</h2>
+<pre><code>python3 tools/soak.py \
+  --serial SERIAL \
+  --out ../private/load-01 \
+  --expected-boot-sha256 YOUR_VERIFIED_INSTALLED_BOOT_SHA256 \
+  --cores 0,1,2,3 \
+  --seconds-per-phase 30 \
+  --data-mib 32 \
+  --battery-stop-c 40 \
+  --max-freq0-khz 1593600 \
+  --max-freq2-khz 902400</code></pre>
+<p>The expected hash is a required, full lowercase SHA-256. The example placeholder is deliberately not a valid hash. Use the hash of the configuration you have independently chosen and installed. Unlike the builder, the soak tool can measure another <code>marlin</code> image when its hash is explicitly supplied; that is not an endorsement of that image.</p>
+<div class="table-wrap"><table><thead><tr>
+<th scope="col">Option</th>
+<th scope="col">Default / range</th>
+<th scope="col">Interpretation</th>
+</tr></thead><tbody>
+<tr><td><code>--cores</code></td><td><code>0,1</code>; indexes 0–3</td><td>CPUs to pin; all must be online</td></tr>
+<tr><td><code>--seconds-per-phase</code></td><td>30; 5–900</td><td>Requested duration of each of two phases</td></tr>
+<tr><td><code>--data-mib</code></td><td>32; 8, 16, 32, 64</td><td>Shared input size, not an all-RAM test</td></tr>
+<tr><td><code>--battery-stop-c</code></td><td>40; 30–40</td><td>Conservative policy cutoff in degrees Celsius</td></tr>
+<tr><td><code>--max-freq0-khz</code></td><td>Unset</td><td>Optional observed CPU0 cpufreq upper bound</td></tr>
+<tr><td><code>--max-freq2-khz</code></td><td>Unset</td><td>Optional observed CPU2 cpufreq upper bound</td></tr>
+<tr><td><code>--adb</code></td><td><code>adb</code></td><td>Host executable</td></tr>
+</tbody></table></div>
+<p>Before load, it checks product, root identity, active boot hash, selected online CPUs, battery temperature, thermal-service state, and availability of <code>taskset</code>, <code>sha256sum</code>, <code>sha512sum</code>, <code>gzip</code>, and <code>timeout</code>. The expected thermal service is <code>vendor.thermal-engine</code>. Another ROM may need a reviewed adaptation.</p>
+<p>The battery sysfs value is interpreted as tenths of a degree Celsius. The initial plausibility check catches grossly invalid readings; it cannot prove units for an arbitrary driver. A cutoff of 40 °C is an experiment policy, not a manufacturer temperature specification and not a substitute for CPU/SoC thermal management.</p>
+<p>The host creates a deterministic data buffer: half pseudorandom bytes, half repeated byte values. It calculates SHA-256 and SHA-512 locally and verifies the uploaded data&#x27;s SHA-256. The target directory is a unique <code>/dev/pixel-lab-&lt;nonce&gt;</code> path; on the case platform <code>/dev</code> is RAM-backed. Inspect this assumption when porting. Input data plus per-core compressed/decompressed working files consume additional RAM; a 32 MiB buffer does not mean a 32 MiB total footprint.</p>
+<p>Each selected CPU receives one pinned worker. Phase <code>hash</code> verifies both digests of the shared data. Phase <code>mixed</code> additionally compresses the buffer, decompresses it to a per-core file, and compares the recovered file&#x27;s SHA-256. Each successful hash iteration counts as two checks; each mixed iteration counts as three. The known expected values come from the host, so “a command completed” is insufficient to pass.</p>
+<p>Workers use device uptime for a deadline, a per-iteration temperature check, a shared STOP file, and an outer <code>timeout</code> of requested phase duration plus 30 seconds. Host monitoring samples approximately every three seconds, with additional command latency. It checks boot continuity, online CPUs, thermal service, temperature, optional reported frequency limits, worker status, and log-stream availability. It imposes a phase watchdog. These checks do not guarantee that every instantaneous clock or temperature excursion is sampled.</p>
+<p>Kernel logs are captured before, during, and after load. The current implementation evaluates critical-message candidates and new PLL failures at the end of the completed workload; it does not promise immediate interruption on the first log line. Worker, temperature, continuity, and transport failures are checked during execution. Existing critical messages stop the load before workers start. Existing early PLL warnings are recorded separately; newly observed PLL lock failures cause the run to fail. <code>dmesg -w</code> behavior and readable timestamps are assumptions of the case platform.</p>
+<h3 id="chapter-6-heading-8">Output and stopping behavior</h3>
+<p>A local run directory contains <code>PRIVATE.txt</code>, <code>journal.jsonl</code>, <code>result.json</code>, generated <code>worker.sh</code>, per-core worker output, and initial/live/final dmesg when available. The temporary host data buffer is removed in cleanup. Raw output includes the device serial and boot UUIDs; keep this directory private.</p>
+<p>Journal events are flushed and fsynced. Result JSON is written through a temporary file and rename. On a normal Python exception or Ctrl-C, cleanup requests STOP, allows workers time to finish their current operation, terminates remaining host ADB processes, stops the log stream, and attempts to remove only that run&#x27;s device directory. <code>device_temporary_files_removed</code> records whether the final device cleanup command succeeded. A successful workload can still need cleanup review.</p>
+<p>Host process termination or cable loss does not guarantee instant termination of every device-side helper. Workers retain finite deadlines and outer timeouts; a kernel hang is outside their control. After reconnecting, inspect remaining <code>pixel-lab</code> processes and the exact <code>cleanup_path</code> recorded for the run. Do not use broad deletion patterns. If the host was forcibly killed before finalization, <code>result.json</code> may be missing; the journal is evidence of an incomplete run, not a pass.</p>
+<p>A successful run proves the recorded bounded checks completed. It does not test all RAM, storage durability, every instruction, GPU load, radio use, deep suspend, or weeks of uptime. It does not verify hardware clock measurements: the optional frequency guards read cpufreq values, which initially hid the divide-by-two issue in this case.</p>
+<h2 id="chapter-6-heading-9"><code>floating_point.awk</code>: the numerical workload used in the case</h2>
+<p>This source preserves the actual 200,000-iteration numerical program used in E08. It evaluates <code>sqrt(x)^2</code>, <code>sin(x)^2 + cos(x)^2</code>, and <code>exp(log(1+x))</code>, reports maximum errors and a trigonometric sum, and returns nonzero when its declared tolerances are exceeded.</p>
+<p>The private harness ran four copies concurrently, pinned with hexadecimal masks <code>1</code>, <code>2</code>, <code>4</code>, and <code>8</code>, with 90-second timeouts, image/temperature preconditions, and before/after boot checks. Those results are in <a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/evidence/floating-point.json">floating-point evidence</a>. The source is included for reproduction; it is not a new automatic device orchestration tool.</p>
+<p>To evaluate the program on a host with AWK:</p>
+<pre><code>awk -f tools/floating_point.awk</code></pre>
+<p>A host result validates the numerical script only. Different AWK and libm implementations may produce different rounding. For a device run, use the already-established product, image, root, CPU, temperature, and rollback checks. Upload the source to an explicitly chosen temporary path, then use the form <code>timeout 90 taskset MASK awk -f PATH</code> for each chosen CPU, capture every exit status, verify continuity afterwards, and remove the uploaded file. Keep thermal protections active. See <a href="#chapter-5">Validation methodology</a> for the comparison limits.</p>
+<h2 id="chapter-6-heading-10"><code>export_summary.py</code>: allowlist export</h2>
+<pre><code>python3 tools/export_summary.py \
+  --run ../private/load-01 \
+  --out ../public-load-01.json</code></pre>
+<p>The exporter accepts the public soak tool&#x27;s schema-1 <code>result.json</code>, not the older private harness format. It exports pass status, selected cores, buffer size, duration, maximum sampled battery temperature, continuity, per-phase iteration counts, and correctness counts. It omits raw text, exception strings, serials, UUIDs, paths, and arbitrary extra fields. The output must not already exist.</p>
+<p>Review even the small export before publication. On a stopped run, <code>boot_continuity=false</code> means continuity was not established by successful completion; it does not alone prove the device rebooted. Consult the private evidence and write a manually reviewed failure classification.</p>
+<h2 id="chapter-6-heading-11">Host tests</h2>
+<pre><code>python3 -m unittest discover -s tests -v</code></pre>
+<p>The real-input reconstruction test is skipped unless a matching private original is explicitly supplied:</p>
+<pre><code>PIXEL_ORIGINAL_BOOT=../private/boot-original.img \
+  python3 -m unittest discover -s tests -v</code></pre>
+<p>The test also needs the intended LZ4 executable on PATH. It reconstructs both variants in memory and refuses a one-byte-modified input. Other tests exercise parser bounds, repacking, DT property preservation, input refusals, error-log matching, privacy export, fastboot response parsing, and simulated soak success/failure cleanup. The supplied transcript distinguishes these checks from physical-device tests.</p>
+<p>Do not suppress a failing test to obtain a green report. Preserve the initial result, classify the problem, fix the responsible layer, and rerun the relevant checks. The recorded ramoops false positive is an example of why that distinction matters.</p>
+<h2 id="chapter-6-heading-12">Rebuild the offline reader</h2>
+<pre><code>python3 tools/render_docs.py
+python3 tools/render_docs.py --site</code></pre>
+<p>The first command renders the package&#x27;s twelve Markdown chapters into <code>READ-ME.html</code> with local navigation, readable code blocks, and scrollable tables. The second generates <code>index.html</code> for the <a href="https://westman2000.github.io/pixel-xl-recovery/">GitHub Pages website</a>, with evidence/source links pointing to GitHub. The renderer uses no network or third-party packages. It intentionally supports only the Markdown subset used by these documents; it is not a general Markdown engine. Edit the Markdown sources first, then regenerate both HTML files.</p>
+<p>The reader references local evidence and source files, so keep it with the extracted project when following those links. The text and navigation work without a server. Use <code>SHA256SUMS</code> to check the files in a distributed package; hashes detect changed bytes, not publisher authenticity.</p>
+<p>GitHub Pages is configured to publish the root of the <code>main</code> branch. The <code>.nojekyll</code> marker serves the prepared HTML directly. After changing distributed files, regenerate <code>SHA256SUMS</code>; public CI checks it. The site and offline reader share the same Markdown sources, so their technical content stays aligned.</p></section>
+<section id="chapter-7"><p class="chapter-meta">07 / 12 &nbsp; · &nbsp; <a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/docs/RESEARCH-PLAN.md">Markdown source</a> &nbsp; · &nbsp; <a href="#contents">Contents</a></p><h1 id="chapter-7-heading-1">Reproduction and research plan</h1>
+<details class="local-toc"><summary>In this chapter</summary><ul><li><a href="#chapter-7-heading-2">Aim and present baseline</a></li><li><a href="#chapter-7-heading-3">Priority order and completion evidence</a></li><li><a href="#chapter-7-heading-4">Validate the public refactor first</a></li><li><a href="#chapter-7-heading-5">Extend confidence in the retained phone</a></li><li><a href="#chapter-7-heading-6">Reproduce on another device</a></li><li><a href="#chapter-7-heading-7">Port to a different compiled boot image</a></li><li><a href="#chapter-7-heading-8">Build a controlled source implementation</a></li><li><a href="#chapter-7-heading-9">Separate the competing clock-path explanations</a></li><li><a href="#chapter-7-heading-10">Frequency exploration comes after stability</a></li><li><a href="#chapter-7-heading-11">Reporting and release milestones</a></li></ul></details>
+<h2 id="chapter-7-heading-2">Aim and present baseline</h2>
+<p>The immediate outcome is a documented operating configuration for one Pixel XL, with a tested two-core fallback and an exact-input offline builder. The next aim is to determine how reproducible the result is, improve the tools&#x27; device validation, and separate competing explanations for the failing clock path.</p>
+<p>This plan describes future work. None of the uncompleted rows below should be presented as an achieved result. Stability remains the priority for the recovered phone; reopening a known-failing configuration is a separate research decision.</p>
+<h2 id="chapter-7-heading-3">Priority order and completion evidence</h2>
+<div class="table-wrap"><table><thead><tr>
+<th scope="col">Priority</th>
+<th scope="col">Work</th>
+<th scope="col">Evidence required to call it complete</th>
+</tr></thead><tbody>
+<tr><td>1</td><td>Exercise the public collector and soak wrapper on a suitable device</td><td>Private journal, installed hash, short and longer successful runs, cleanup checks, and a reviewed public summary</td></tr>
+<tr><td>2</td><td>Observe retained configuration over normal use</td><td>Dated uptime/reboot record, representative application use, charging conditions, failure logs, and standby observations</td></tr>
+<tr><td>3</td><td>Reproduce on a second consenting owner&#x27;s <code>marlin</code></td><td>Independent baseline, source hash/provenance, rollback verification, exact change record, and correctness tests</td></tr>
+<tr><td>4</td><td>Establish controlled kernel source provenance</td><td>Source commit, config, toolchain, reproducible build instructions, unmodified control build, and image layout validation</td></tr>
+<tr><td>5</td><td>Separate clock-parent and ACD effects</td><td>A compatible experimental matrix with one-factor comparisons and explicit treatment of unsupported combinations</td></tr>
+<tr><td>6</td><td>Assess wider frequency and power behavior</td><td>Measured clocks, temperatures, energy/standby observations, repeated load and transition checks at each justified configuration</td></tr>
+<tr><td>7</td><td>Prepare a maintainable community implementation</td><td>Reviewed source option, compatibility matrix, regression tests, documented limitations, and a release process</td></tr>
+</tbody></table></div>
+<p>Priorities 1–3 provide useful evidence without requiring higher frequencies or renewed testing of the failing normal path. A second negative report, with good identification and logs, is as useful as a success report.</p>
+<h2 id="chapter-7-heading-4">Validate the public refactor first</h2>
+<p>When a suitable phone is available, compare a new collector snapshot with manually read product, boot hash, slot, online CPUs, and temperature. Verify that requested pstore is captured or its absence is recorded. Check that the boot backup matches the remote hash and remains unchanged.</p>
+<p>Run a short public soak on an already-established configuration, then a longer bounded run if results warrant it. Confirm worker affinity and process exit status, sample continuity, and verify temporary-directory cleanup. Check the exported public JSON against the private result. Record exact ADB, Python, and host versions.</p>
+<p>Host simulations already exercise success, temperature stop, unexpected boot identity, and worker failure. Do not create a real overheat or corrupt a working boot image merely to test those branches. A deliberately low policy cutoff on an otherwise normal-temperature phone can test refusal behavior; a malformed input file can test offline hash gates. Test higher-risk device events only on an explicitly designated test unit with recovery available.</p>
+<h2 id="chapter-7-heading-5">Extend confidence in the retained phone</h2>
+<p>The completed load duration is short. A practical follow-up record should distinguish:</p>
+<ul>
+<li>Normal reboots from fully powered-off starts.</li>
+<li>Display-off states from actual suspend entry and exit.</li>
+<li>USB-powered tests from battery-powered use.</li>
+<li>CPU arithmetic from GPU, camera, media, storage, and radio activity.</li>
+<li>Thermal stops from checksum failures, resets, application exceptions, and transport disconnects.</li>
+</ul>
+<p>Begin with ordinary use and staged, attended load sessions. Increase duration only after the previous stage passes and temperatures settle. For example, a 30-minute requested CPU run fits the current wrapper&#x27;s two 900-second maximum phases; repeated sessions with cooling and log review give better context than an unattended retry loop. A duration target is a proposed experiment, not a guarantee or a manufacturer specification.</p>
+<p>Record charging state, approximate room temperature, screen state, and observed battery temperature. Battery capacity and cycle fields in this case are not trustworthy state-of-health estimates. A controlled discharge experiment is a separate battery investigation and should not be mixed into CPU clock tuning.</p>
+<p>Deep suspend needs explicit study because <code>lpm_levels.sleep_disabled=1</code> was already present in the original image. Do not remove it silently while claiming to reproduce the retained configuration. If a future experiment changes sleep behavior, give that image a new hash and experiment ID, keep the current image as fallback, and measure actual suspend/resume behavior and idle energy.</p>
+<h2 id="chapter-7-heading-6">Reproduce on another device</h2>
+<p>Use the <a href="#chapter-10">device report template</a>. Establish the phone&#x27;s product, installed software, lock state, active slot, original image hash, symptoms, and accessible transports before deciding whether the clock-path hypothesis fits.</p>
+<p>For the exact supported source hash, the builder can reproduce the same two images; each device still needs its own recovery baseline and validation. For another source hash, stop the existing binary transformation path. The diagnostic collector can still be useful, but changed offsets and image provenance must be established through a new profile or source implementation.</p>
+<p>A useful comparison includes a known-healthy <code>marlin</code> on matching software. Healthy hardware can help determine whether the alternate-PLL divider behavior is a general property of this driver configuration or peculiar to the case installation. Do not assume that a healthy control&#x27;s working settings are safe for the failing phone.</p>
+<p>Avoid transferring entire private logs between strangers. Exchange a reviewed numerical summary, exact image hashes, selected relevant lines, and a completed report. Owners should retain the original full evidence locally.</p>
+<h2 id="chapter-7-heading-7">Port to a different compiled boot image</h2>
+<p>Prefer a controlled source build when feasible. If binary work is justified, a new profile requires all of the following:</p>
+<ol>
+<li>Establish which boot image belongs to the installed system/vendor build and slot. Preserve it unchanged and identify it by full hash.</li>
+<li>Parse the actual boot header, compression framing, payload boundaries, appended device trees, and trailing data. Do not force a modern or signed layout through the legacy-v0 parser.</li>
+<li>Establish the source structures and their compiled layout for that image. Offsets from this case are not transferable evidence.</li>
+<li>Locate each intended field through trustworthy symbols or independently reviewed binary analysis, and verify the surrounding values. Record how address-to-file-offset translation was established.</li>
+<li>Confirm the PLL divider interpretation and parent/ACD semantics in that image&#x27;s driver version. Similar names are insufficient.</li>
+<li>Enumerate every relevant device-tree frequency table and retain existing voltage-corner pairs. Check all DTBs that the image can select, not just the first one.</li>
+<li>Preserve the ramdisk and every unrelated image component. Independently validate the new structure and DTBs. Do not silently drop a signature or footer.</li>
+<li>Give the new profile a distinct ID, input hash, output hashes, source/tool provenance, and tests. Obtain a reviewed recovery plan before physical validation.</li>
+</ol>
+<p>Changing <code>source_boot_sha256</code> in the existing JSON to make the builder accept a different image does not satisfy these requirements. The final output gate also encodes a known result; replacing all expected hashes without validating the transformation defeats the purpose of a profile.</p>
+<h2 id="chapter-7-heading-8">Build a controlled source implementation</h2>
+<p>Recover the exact ROM build manifest, kernel commit, configuration, compiler/linker versions, and packaging steps if possible. First build a control kernel without the workaround. Determine whether it reproduces the relevant behavior and remains compatible with the installed ramdisk and userspace. Record differences if byte-identical reproduction is unavailable.</p>
+<p>A source implementation could expose an explicitly named option for the alternate clock path and corrected divider values, document its interaction with ACD, and apply selected frequency caps in device-specific DT data. Preserve default behavior for unaffected devices unless broader evidence supports a change. Do not turn this single case into a silent global driver default.</p>
+<p>Validation should include source review, boot layout and DT inspection, measured clock behavior, arithmetic checks, reboots, and power-state transitions. The old binary profile remains useful as a reproducible historical reference, even if a better source implementation replaces it for new work.</p>
+<h2 id="chapter-7-heading-9">Separate the competing clock-path explanations</h2>
+<p>The existing experiment changed multiple related factors. The following matrix is a research design, not an instruction to flash these states into the recovered phone:</p>
+<div class="table-wrap"><table><thead><tr>
+<th scope="col">Clock path</th>
+<th scope="col">ACD</th>
+<th scope="col">Divider/caps</th>
+<th scope="col">Existing evidence or open question</th>
+</tr></thead><tbody>
+<tr><td>Normal primary path</td><td>Original mode</td><td>Performance cap near 902 MHz</td><td>E02 restarted with repeated lock warnings; low frequency alone was insufficient</td></tr>
+<tr><td>Normal primary path</td><td>Disabled</td><td>Same conservative caps</td><td>Not tested; may help distinguish ACD dependence if the driver permits a valid configuration</td></tr>
+<tr><td>Alternate path</td><td>Disabled</td><td>Original divide-by-two</td><td>Booted and computed correctly; actual clocks were half reported</td></tr>
+<tr><td>Alternate path</td><td>Disabled</td><td>Corrected divide-by-one, retained caps</td><td>E08 retained configuration and recorded validation</td></tr>
+<tr><td>Alternate path</td><td>Enabled</td><td>Any</td><td>Rejected by the inspected driver; not a valid independent comparison without deeper engineering</td></tr>
+</tbody></table></div>
+<p>An A/B/A return sequence can improve causal confidence if it is justified on a designated test device: reproduce a baseline, change one supported factor, then confirm the baseline again. It also reintroduces known failure exposure, so it is not required merely to keep the recovered phone useful.</p>
+<p>Repeated lock warnings can arise from the clock circuit, its supply, timing/initialization, or related control logic. Software experiments alone cannot conclusively identify a defective solder joint or rail. A hardware-lab investigation would need its own measurement plan and appropriately qualified equipment access. Heating or reflow is not a diagnostic result and is not part of this toolkit.</p>
+<h2 id="chapter-7-heading-10">Frequency exploration comes after stability</h2>
+<p>The retained performance cap is conservative and was not proven optimal. A future campaign could evaluate additional existing operating points one step at a time, with measured clock verification, identical workloads, thermal records, a new image hash per step, and rollback after any correctness or continuity failure.</p>
+<p>Do not infer permission to raise voltage, disable mitigation, or remove the DT limits from this plan. Keep voltage entries and thermal behavior unchanged when testing a frequency hypothesis. An apparent speed increase without clock measurement and correctness checks can repeat the divide-by-two misunderstanding.</p>
+<p>Performance reporting should distinguish per-core throughput, aggregate throughput, UI behavior, and energy. Use multiple repeated runs under comparable starting temperature and background activity. The earlier approximately 21% SHA improvement on the two-core system does not estimate whole-phone improvement from E08.</p>
+<h2 id="chapter-7-heading-11">Reporting and release milestones</h2>
+<p>The first public package can accurately be described as a <strong>single-device case study with an exact-image reconstruction toolkit</strong>. It should not be advertised as a universal repair, a newly discovered physical defect, or an exhaustive comparison with earlier community work.</p>
+<p>A later release should state what changed, whether new tools were actually run on hardware, which original hashes are supported, and which failures remain. Keep a changelog. Preserve old result files when a parser bug is corrected and add a review note, as was done for the ramoops false alarm.</p>
+<p>For each later public release, review the archive for private identifiers, raw dumps, unrelated files, and binary redistribution obligations. The owner-selected publication destination is <a href="https://github.com/westman2000/pixel-xl-recovery">westman2000/pixel-xl-recovery</a>. Publication there does not imply endorsement by an upstream project.</p></section>
+<section id="chapter-8"><p class="chapter-meta">08 / 12 &nbsp; · &nbsp; <a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/docs/REFERENCES.md">Markdown source</a> &nbsp; · &nbsp; <a href="#contents">Contents</a></p><h1 id="chapter-8-heading-1">References and source provenance</h1>
+<details class="local-toc"><summary>In this chapter</summary><ul><li><a href="#chapter-8-heading-2">Reference code used to interpret the clock path</a></li><li><a href="#chapter-8-heading-3">Boot format and Android tools</a></li><li><a href="#chapter-8-heading-4">Device trees and compression</a></li><li><a href="#chapter-8-heading-5">Community context and attribution</a></li></ul></details>
+<h2 id="chapter-8-heading-2">Reference code used to interpret the clock path</h2>
+<p>The reference repository is <a href="https://github.com/LineageOS/android_kernel_google_marlin">LineageOS/android_kernel_google_marlin</a>, pinned for this package to commit:</p>
+<pre><code>4075955d5b36f402a0f43ae01b708ae4705ce484</code></pre>
+<p>The following files at that commit matched the local reference copies used in the investigation. Full file SHA-256 values and raw URLs are recorded in <a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/evidence/source-references.json">source-references.json</a>.</p>
+<div class="table-wrap"><table><thead><tr>
+<th scope="col">File</th>
+<th scope="col">Relevance</th>
+</tr></thead><tbody>
+<tr><td><a href="https://github.com/LineageOS/android_kernel_google_marlin/blob/4075955d5b36f402a0f43ae01b708ae4705ce484/drivers/clk/msm/clock-cpu-8996.c">clock-cpu-8996.c</a></td><td>CPU clock parents, alternate PLL structures, ACD interaction, and frequency-table selection</td></tr>
+<tr><td><a href="https://github.com/LineageOS/android_kernel_google_marlin/blob/4075955d5b36f402a0f43ae01b708ae4705ce484/include/soc/qcom/clock-alpha-pll.h">clock-alpha-pll.h</a></td><td>Alternate PLL structure fields and layout interpretation</td></tr>
+<tr><td><a href="https://github.com/LineageOS/android_kernel_google_marlin/blob/4075955d5b36f402a0f43ae01b708ae4705ce484/drivers/clk/msm/clock-alpha-pll.c">clock-alpha-pll.c</a></td><td>Programming of alpha PLL configuration fields</td></tr>
+<tr><td><a href="https://github.com/LineageOS/android_kernel_google_marlin/blob/4075955d5b36f402a0f43ae01b708ae4705ce484/drivers/clk/msm/clock-pll.c">clock-pll.c</a></td><td>Normal PLL enable/lock handling and associated messages</td></tr>
+<tr><td><a href="https://github.com/LineageOS/android_kernel_google_marlin/blob/4075955d5b36f402a0f43ae01b708ae4705ce484/drivers/cpufreq/qcom-cpufreq.c">qcom-cpufreq.c</a></td><td>cpufreq integration and reported frequency behavior</td></tr>
+<tr><td><a href="https://github.com/LineageOS/android_kernel_google_marlin/blob/4075955d5b36f402a0f43ae01b708ae4705ce484/arch/arm/boot/dts/qcom/msm8996pro.dtsi">msm8996pro.dtsi</a></td><td>MSM8996pro device-tree clock/frequency data</td></tr>
+<tr><td><a href="https://github.com/LineageOS/android_kernel_google_marlin/blob/4075955d5b36f402a0f43ae01b708ae4705ce484/arch/arm/boot/dts/qcom/msm8996.dtsi">msm8996.dtsi</a></td><td>Related platform device-tree definitions</td></tr>
+</tbody></table></div>
+<p>The DTS files are under <code>arch/arm/boot/dts/qcom</code> in this tree even though the decompressed kernel is an ARM64 Image. Do not substitute a guessed <code>arch/arm64</code> URL.</p>
+<p><strong>This is reference-code provenance, not compiled-image provenance.</strong> A match for these files does not establish the original kernel&#x27;s full commit, build configuration, compiler, or ROM distribution authenticity. The original boot&#x27;s full hash is the binary builder&#x27;s compatibility identity.</p>
+<h2 id="chapter-8-heading-3">Boot format and Android tools</h2>
+<ul>
+<li><a href="https://source.android.com/docs/core/architecture/bootloader/boot-image-header">AOSP boot-image header documentation</a> describes header versions and fields. The kit deliberately implements only the case&#x27;s legacy-v0 subset.</li>
+<li><a href="https://source.android.com/docs/core/architecture/bootloader/locking_unlocking">AOSP bootloader locking/unlocking documentation</a> describes lock-state transitions and data-reset behavior. The case device was already unlocked.</li>
+<li><a href="https://source.android.com/docs/core/ota/ab/ab_implement">AOSP A/B implementation documentation</a> describes the slot model relevant to selecting a matching boot partition.</li>
+<li><a href="https://developer.android.com/tools/releases/platform-tools">Google Android SDK Platform Tools</a> is the official source for ADB and fastboot.</li>
+<li><a href="https://android.googlesource.com/platform/system/tools/mkbootimg/+/refs/heads/main/unpack_bootimg.py">AOSP unpack_bootimg.py</a> is the upstream boot-image unpacker used as an independent format reference. The linked main branch is mutable; a future reproducible build should record the exact revision it uses. The private campaign retained its local copy, but no exact upstream revision is claimed here.</li>
+</ul>
+<h2 id="chapter-8-heading-4">Device trees and compression</h2>
+<ul>
+<li><a href="https://devicetree-specification.readthedocs.io/en/stable/flattened-format.html">Devicetree flattened-format specification</a> documents the FDT header and structure tokens, including NOP. The transformation shortens selected property payloads and fills the freed structure space with NOP tokens.</li>
+<li><a href="https://git.kernel.org/pub/scm/utils/dtc/dtc.git">Device Tree Compiler / libfdt upstream</a> provided the independent DT checks. The private campaign built version 1.7.2 at commit <code>2d10aa2afe35527728db30b35ec491ecb6959e5c</code>.</li>
+<li><a href="https://github.com/lz4/lz4">LZ4 upstream</a> provides the compression utility. Exact public reconstruction used LZ4 1.10.0 with <code>-12 -B7 -f</code>, plus a decompression roundtrip and a final full-image hash gate.</li>
+</ul>
+<h2 id="chapter-8-heading-5">Community context and attribution</h2>
+<p>CPU-count restrictions are a diagnostic technique, and community bootloop workarounds predate this case. This package does not claim invention of disabling CPUs, alternative clock paths, or a universal new repair. It documents the specific evidence chain and resulting configuration observed here.</p>
+<p>No systematic survey of every earlier Pixel/Nexus bootloop report was completed for this package. Similar forum symptoms should not be treated as proof of a shared hardware defect. A useful future literature review would record device codename, original software, actual diagnostic logs, precise changes, validation duration, and whether data/lock state constrained the experiment.</p>
+<p>Upstream projects are cited for code and format interpretation. They have not endorsed this workaround. Full source files and compiled firmware are not redistributed in this kit; see <a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/NOTICE">NOTICE</a> for licensing scope.</p></section>
+<section id="chapter-9"><p class="chapter-meta">09 / 12 &nbsp; · &nbsp; <a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/CONTRIBUTING.md">Markdown source</a> &nbsp; · &nbsp; <a href="#contents">Contents</a></p><h1 id="chapter-9-heading-1">Contributing observations and improvements</h1>
+<p>The most useful contribution is a precise, reproducible report, including a failed reproduction. Use <a href="#chapter-10">the device report template</a>. Begin with the original image hash and observed device identity, then describe changes, measurements, and limitations.</p>
+<h2 id="chapter-9-heading-2">Reports</h2>
+<p>Keep raw diagnostics and original boot images private. Review a public numerical export and selected log excerpts before sharing. Remove device serials, IMEI/MEID values, account names, network identifiers, boot UUIDs, local usernames and paths, and unrelated application traces. Do not post a whole pstore directory or bugreport merely because one PLL line is relevant.</p>
+<p>Record whether the supplied public tools actually ran on hardware or only on simulated transport. Identify temperatures by sensor and units. Distinguish normal reboots from cold starts, display changes from deep suspend, and arithmetic success from overall hardware health. Give exact durations and checks rather than “stable for a while.”</p>
+<p>For failures, preserve the initial result and classify the evidence: checksum mismatch, reset, missing transport, temperature policy stop, image mismatch, or harness problem. If a detector was wrong, retain the original result and explain the review. Do not silently change a failed report into a pass.</p>
+<h2 id="chapter-9-heading-3">Code and profiles</h2>
+<p>Run the host tests described in <a href="#chapter-6">Tools</a>. Changes to boot parsing, transformations, or refusal behavior need focused tests. Profiles for additional images need the source hash, layout evidence, field-location method, independent structural checks, output hashes, recovery plan, and actual device results when available.</p>
+<p>Do not weaken an input hash gate to make an unsupported image pass. Do not introduce automatic unlocking, wiping, relocking, slot changes, or hidden thermal/frequency mutations. Keep device effects explicit in both the CLI and documentation. Flash planning must remain separate from execution unless a later reviewed design deliberately changes that contract.</p>
+<p>Avoid hard-coded private serials or host paths. Use explicit device selection and unique local output directories. New evidence should be selected or allowlisted for publication, not copied wholesale from a private run.</p>
+<h2 id="chapter-9-heading-4">Attribution and release state</h2>
+<p>Document upstream sources without implying endorsement or exact compiled-image provenance that has not been established. Preserve license notices. This package distributes newly written tools/docs and selected case evidence; it does not distribute firmware binaries.</p>
+<p>The project repository is <a href="https://github.com/westman2000/pixel-xl-recovery">westman2000/pixel-xl-recovery</a>. Submit a reviewed report through <a href="https://github.com/westman2000/pixel-xl-recovery/issues/new/choose">the device-report issue template</a>, or open an issue describing a tool problem. Code improvements can be proposed in a pull request. Do not attach private source images or complete raw collections.</p></section>
+<section id="chapter-10"><p class="chapter-meta">10 / 12 &nbsp; · &nbsp; <a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/templates/DEVICE-REPORT.md">Markdown source</a> &nbsp; · &nbsp; <a href="#contents">Contents</a></p><h1 id="chapter-10-heading-1">Pixel XL clock-path investigation report</h1>
+<details class="local-toc"><summary>In this chapter</summary><ul><li><a href="#chapter-10-heading-2">Scope and identification</a></li><li><a href="#chapter-10-heading-3">Original symptom and evidence</a></li><li><a href="#chapter-10-heading-4">Experiment record</a></li><li><a href="#chapter-10-heading-5">Validation</a></li><li><a href="#chapter-10-heading-6">Conclusion and limits</a></li><li><a href="#chapter-10-heading-7">Publication review</a></li></ul></details>
+<p>Replace the placeholders with observations. Leave unknown fields as “unknown.” Keep the original private collection locally; do not attach it unreviewed.</p>
+<h2 id="chapter-10-heading-2">Scope and identification</h2>
+<ul>
+<li>Report date and time basis:</li>
+<li>Owner consent and data-preservation constraints:</li>
+<li>Product/codename (no serial):</li>
+<li>ROM property and Android release:</li>
+<li>Kernel release:</li>
+<li>ROM/source provenance, if established:</li>
+<li>Bootloader version and already-unlocked state:</li>
+<li>Active slot at backup and at each installation:</li>
+<li>Original boot SHA-256 and byte size:</li>
+<li>Available transports and modes:</li>
+<li>Public toolkit version / host OS / Python / ADB / fastboot / LZ4 versions:</li>
+</ul>
+<h2 id="chapter-10-heading-3">Original symptom and evidence</h2>
+<p>Describe the visible failure and how long it took. State whether recovery booted, which CPUs were available there, and whether the preserved log belongs to the failing boot.</p>
+<ul>
+<li>Relevant log excerpt, with timestamps and private identifiers removed:</li>
+<li>Matching warning count within the captured buffer:</li>
+<li>Conclusive panic or reset reason, if actually captured:</li>
+<li>Other plausible software/hardware explanations:</li>
+<li>Battery temperature sensor, units, and power/charging conditions:</li>
+</ul>
+<h2 id="chapter-10-heading-4">Experiment record</h2>
+<div class="table-wrap"><table><thead><tr>
+<th scope="col">ID</th>
+<th scope="col">Input hash</th>
+<th scope="col">Changes</th>
+<th scope="col">Output/installed hash</th>
+<th scope="col">Boot result</th>
+<th scope="col">CPUs/parents/measured clocks</th>
+<th scope="col">Workload result</th>
+<th scope="col">Rollback result</th>
+</tr></thead><tbody>
+<tr><td>Baseline</td><td></td><td>None</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Rescue</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Candidate</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+</tbody></table></div>
+<p>Distinguish the first rescue candidate from a rescue image already tested on this device. Record any UI, cpuset, application, charging, or background-work changes that could affect performance comparisons.</p>
+<h2 id="chapter-10-heading-5">Validation</h2>
+<ul>
+<li>Public tools used on real hardware, private harness, or simulation:</li>
+<li>Correctness algorithm(s), input size, and host reference method:</li>
+<li>Per-core iterations and total checks:</li>
+<li>Requested load time and observed harness duration:</li>
+<li>Boot continuity and online CPUs:</li>
+<li>Reported rates versus independently measured clocks under load:</li>
+<li>Maximum sampled battery temperature and thermal-service status:</li>
+<li>New PLL messages or critical kernel candidates:</li>
+<li>Reboots, cold starts, display transitions, and actual suspend tests (separate counts):</li>
+<li>Cleanup verified:</li>
+<li>Any detector false positive, preserved original result, and review explanation:</li>
+</ul>
+<p>Attach the reviewed public summary JSON if applicable. A temperature stop, disconnected cable, wrong image, and arithmetic mismatch are different outcomes; describe which one occurred.</p>
+<h2 id="chapter-10-heading-6">Conclusion and limits</h2>
+<ul>
+<li>Retained configuration and hash:</li>
+<li>Tested fallback and hash:</li>
+<li>Observation supported by this report:</li>
+<li>Hypothesis that remains unproven:</li>
+<li>Unperformed tests / unresolved issues:</li>
+<li>Next proposed experiment and what question it would answer:</li>
+</ul>
+<h2 id="chapter-10-heading-7">Publication review</h2>
+<p>Confirm manually that shared material contains no serial/IMEI, account data, network identifiers, boot UUIDs, private host paths, full unreviewed logs, or firmware binaries. Include only information necessary to reproduce or interpret the result.</p></section>
+<section id="chapter-11"><p class="chapter-meta">11 / 12 &nbsp; · &nbsp; <a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/PUBLIC-POST.md">Markdown source</a> &nbsp; · &nbsp; <a href="#contents">Contents</a></p><h1 id="chapter-11-heading-1">Pixel XL bootloop case: recovering four cores through an alternate clock path</h1>
+<p>We investigated a first-generation Pixel XL (<code>marlin</code>) that had been unused for years and repeatedly failed to stay in Android. The original failed-boot console contained 100 <code>perfcl_pll</code> lock warnings. Recovery could still run all four CPUs, so the evidence did not support simply declaring the two performance cores dead.</p>
+<p>A boot image restricted to CPU0/1 first restored a usable Android session. Capping the performance cluster near 902 MHz and enabling CPU2 on the original clock path still produced repeated warnings and another restart. Switching both clusters to the driver&#x27;s alternate PLL mode, with ACD disabled as required by that mode, allowed all four cores to execute correct workloads.</p>
+<p>There was another finding: the alternate path initially ran at half its reported frequency. Clock measurements under load exposed a divide-by-two setting. Correcting two data bytes in the decompressed kernel restored measured rates to the intended values. The retained image also caps CPU0/1 at 1,593.6 MHz and CPU2/3 at 902.4 MHz, preserving retained voltage entries and thermal settings.</p>
+<p>The selected configuration completed 7,252 checksum/compression checks over approximately twelve minutes of requested load, 800,000 floating-point iterations across four cores, three normal reboots, and ten display Dozing/Awake transitions. Maximum sampled battery temperature during its load runs was 39.0 °C. One early PLL warning remained; the repeated failure sequence did not recur in those runs.</p>
+<p>This is <strong>one device</strong>, not a universal fix or a proven diagnosis of a particular physical defect. The PLL path and ACD mode changed together, and the exact compiled kernel provenance remains unknown. Deep suspend, days of reliability, and a second-device reproduction remain open work.</p>
+<p>The accompanying package contains the full experiment sequence, failed approaches, sanitized numerical evidence, a recovery/rollback runbook, an exact-input boot builder, diagnostic collection, a bounded per-core load tool, host tests, and a research plan. The builder accepts only one full original-image SHA-256 and reproduces the two validated case images byte-for-byte. No firmware binaries or personal device identifiers are distributed.</p>
+<p>The device campaign used a private harness. The refactored public scripts have host tests and exact reconstruction checks; their new ADB wrappers still need a fresh hardware validation. The documentation also preserves a useful harness mistake: <code>Oops:</code> incorrectly matched normal <code>ramoops</code> initialization until the detector was fixed and the original results were reviewed.</p>
+<p>We would welcome carefully documented independent reports, especially comparisons that help separate clock-parent and ACD effects. Start with the included README and device-report template. Do not bypass the image hash checks or transfer raw offsets to a different build.</p>
+<p>Read the documentation and get the tools at <a href="https://github.com/westman2000/pixel-xl-recovery">westman2000/pixel-xl-recovery</a>, or <a href="https://github.com/westman2000/pixel-xl-recovery/releases/latest">download the latest release</a>. Share reviewed results through the repository&#x27;s <a href="https://github.com/westman2000/pixel-xl-recovery/issues/new/choose">report template</a>.</p></section>
+<section id="chapter-12"><p class="chapter-meta">12 / 12 &nbsp; · &nbsp; <a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/CHANGELOG.md">Markdown source</a> &nbsp; · &nbsp; <a href="#contents">Contents</a></p><h1 id="chapter-12-heading-1">Changelog</h1>
+<h2 id="chapter-12-heading-2">0.1.0 — initial public release, 2026-10-12</h2>
+<ul>
+<li>Documented the single-device recovery sequence, including E02&#x27;s failure, the alternate-clock half-frequency finding, the divider correction, and retained E08 validation.</li>
+<li>Added a strict profile for one original boot hash and exact offline reproduction of rescue and retained four-core images.</li>
+<li>Added private collection, plan-only flash validation, bounded correctness load, allowlist export, and the original floating-point workload source.</li>
+<li>Preserved sanitized numerical evidence, source-reference hashes, and the reviewed ramoops detector false alarm.</li>
+<li>Added host tests, recovery/rollback instructions, validation methodology, a research/porting plan, and a community report template.</li>
+<li>Added a GitHub device-report template and host CI for Python 3.9 and 3.12. The real-image test remains private and is skipped in public CI.</li>
+<li>Added a responsive <a href="https://westman2000.github.io/pixel-xl-recovery/">GitHub Pages reading site</a> with chapter navigation, code blocks, evidence links, and toolkit downloads, generated from the same Markdown as the offline reader.</li>
+<li>Published the prepared source and downloadable package at <a href="https://github.com/westman2000/pixel-xl-recovery">westman2000/pixel-xl-recovery</a>. Public ADB wrapper hardware validation remains pending.</li>
+</ul></section></main></div>
+<footer class="footer">One device and one exact source image. This is a documented workaround with bounded evidence, not a universal repair or a proven physical diagnosis. <a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/LICENSE">License</a> · <a href="https://github.com/westman2000/pixel-xl-recovery/blob/main/NOTICE">Upstream notices</a></footer>
+</body></html>

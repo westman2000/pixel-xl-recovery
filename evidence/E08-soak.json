@@ -1,0 +1,632 @@
+{
+  "label": "E08-soak",
+  "data_sha256": "054f0160fed7dd003f4520bd50f235b2beb79868413e19e106e85dccb86a9d8a",
+  "boot_sha256": "4635c2c76c37ff34259bfdc15d7e430c95cbc24cfd85cd864b877f0a21d2ccee",
+  "phases": [
+    {
+      "phase": "hash",
+      "elapsed_seconds": 303.67,
+      "iterations_by_core": [
+        742,
+        754,
+        464,
+        470
+      ],
+      "correctness_checks": 4860
+    },
+    {
+      "phase": "mixed",
+      "elapsed_seconds": 312.6,
+      "iterations_by_core": [
+        115,
+        116,
+        82,
+        84
+      ],
+      "correctness_checks": 1191
+    }
+  ],
+  "passed": true,
+  "clock_under_load": "pwrcl\n1593600000\n1593608048\nperfcl\n902400000\n902407456",
+  "total_elapsed_seconds": 616.83,
+  "boot_continuity": true,
+  "telemetry": [
+    {
+      "elapsed_seconds": 0.92,
+      "phase": "hash",
+      "TEMP": "367",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "93"
+    },
+    {
+      "elapsed_seconds": 13.49,
+      "phase": "hash",
+      "TEMP": "370",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "93"
+    },
+    {
+      "elapsed_seconds": 24.26,
+      "phase": "hash",
+      "TEMP": "370",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "93"
+    },
+    {
+      "elapsed_seconds": 35.13,
+      "phase": "hash",
+      "TEMP": "375",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "93"
+    },
+    {
+      "elapsed_seconds": 45.86,
+      "phase": "hash",
+      "TEMP": "372",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "94"
+    },
+    {
+      "elapsed_seconds": 56.57,
+      "phase": "hash",
+      "TEMP": "375",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "94"
+    },
+    {
+      "elapsed_seconds": 67.39,
+      "phase": "hash",
+      "TEMP": "375",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "94"
+    },
+    {
+      "elapsed_seconds": 78.14,
+      "phase": "hash",
+      "TEMP": "377",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "94"
+    },
+    {
+      "elapsed_seconds": 88.86,
+      "phase": "hash",
+      "TEMP": "377",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "94"
+    },
+    {
+      "elapsed_seconds": 99.6,
+      "phase": "hash",
+      "TEMP": "380",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "94"
+    },
+    {
+      "elapsed_seconds": 110.3,
+      "phase": "hash",
+      "TEMP": "377",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "94"
+    },
+    {
+      "elapsed_seconds": 121.05,
+      "phase": "hash",
+      "TEMP": "380",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "94"
+    },
+    {
+      "elapsed_seconds": 131.8,
+      "phase": "hash",
+      "TEMP": "382",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "94"
+    },
+    {
+      "elapsed_seconds": 142.62,
+      "phase": "hash",
+      "TEMP": "382",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "94"
+    },
+    {
+      "elapsed_seconds": 153.55,
+      "phase": "hash",
+      "TEMP": "382",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "94"
+    },
+    {
+      "elapsed_seconds": 164.25,
+      "phase": "hash",
+      "TEMP": "385",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "94"
+    },
+    {
+      "elapsed_seconds": 175.06,
+      "phase": "hash",
+      "TEMP": "382",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "94"
+    },
+    {
+      "elapsed_seconds": 185.78,
+      "phase": "hash",
+      "TEMP": "385",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "94"
+    },
+    {
+      "elapsed_seconds": 196.53,
+      "phase": "hash",
+      "TEMP": "387",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "94"
+    },
+    {
+      "elapsed_seconds": 207.27,
+      "phase": "hash",
+      "TEMP": "385",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "94"
+    },
+    {
+      "elapsed_seconds": 217.95,
+      "phase": "hash",
+      "TEMP": "385",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "94"
+    },
+    {
+      "elapsed_seconds": 228.66,
+      "phase": "hash",
+      "TEMP": "385",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "94"
+    },
+    {
+      "elapsed_seconds": 239.35,
+      "phase": "hash",
+      "TEMP": "385",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "94"
+    },
+    {
+      "elapsed_seconds": 250.1,
+      "phase": "hash",
+      "TEMP": "385",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "94"
+    },
+    {
+      "elapsed_seconds": 260.87,
+      "phase": "hash",
+      "TEMP": "385",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "94"
+    },
+    {
+      "elapsed_seconds": 271.8,
+      "phase": "hash",
+      "TEMP": "387",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "94"
+    },
+    {
+      "elapsed_seconds": 282.52,
+      "phase": "hash",
+      "TEMP": "390",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "95"
+    },
+    {
+      "elapsed_seconds": 293.26,
+      "phase": "hash",
+      "TEMP": "387",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "95"
+    },
+    {
+      "elapsed_seconds": 303.67,
+      "phase": "hash",
+      "TEMP": "390",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "307200",
+      "THERMAL": "running",
+      "CAPACITY": "95"
+    },
+    {
+      "elapsed_seconds": 304.61,
+      "phase": "mixed",
+      "TEMP": "390",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "95"
+    },
+    {
+      "elapsed_seconds": 315.43,
+      "phase": "mixed",
+      "TEMP": "385",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "95"
+    },
+    {
+      "elapsed_seconds": 326.33,
+      "phase": "mixed",
+      "TEMP": "390",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "95"
+    },
+    {
+      "elapsed_seconds": 337.06,
+      "phase": "mixed",
+      "TEMP": "385",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "95"
+    },
+    {
+      "elapsed_seconds": 347.91,
+      "phase": "mixed",
+      "TEMP": "387",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "95"
+    },
+    {
+      "elapsed_seconds": 358.6,
+      "phase": "mixed",
+      "TEMP": "387",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "95"
+    },
+    {
+      "elapsed_seconds": 369.32,
+      "phase": "mixed",
+      "TEMP": "385",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "95"
+    },
+    {
+      "elapsed_seconds": 380.06,
+      "phase": "mixed",
+      "TEMP": "387",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "95"
+    },
+    {
+      "elapsed_seconds": 390.82,
+      "phase": "mixed",
+      "TEMP": "387",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "95"
+    },
+    {
+      "elapsed_seconds": 401.59,
+      "phase": "mixed",
+      "TEMP": "385",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "95"
+    },
+    {
+      "elapsed_seconds": 412.34,
+      "phase": "mixed",
+      "TEMP": "385",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "95"
+    },
+    {
+      "elapsed_seconds": 423.13,
+      "phase": "mixed",
+      "TEMP": "390",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "95"
+    },
+    {
+      "elapsed_seconds": 433.85,
+      "phase": "mixed",
+      "TEMP": "390",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "95"
+    },
+    {
+      "elapsed_seconds": 444.63,
+      "phase": "mixed",
+      "TEMP": "385",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "95"
+    },
+    {
+      "elapsed_seconds": 455.57,
+      "phase": "mixed",
+      "TEMP": "390",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "95"
+    },
+    {
+      "elapsed_seconds": 466.42,
+      "phase": "mixed",
+      "TEMP": "387",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "96"
+    },
+    {
+      "elapsed_seconds": 477.15,
+      "phase": "mixed",
+      "TEMP": "387",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "96"
+    },
+    {
+      "elapsed_seconds": 487.91,
+      "phase": "mixed",
+      "TEMP": "390",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "96"
+    },
+    {
+      "elapsed_seconds": 498.7,
+      "phase": "mixed",
+      "TEMP": "385",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "96"
+    },
+    {
+      "elapsed_seconds": 509.45,
+      "phase": "mixed",
+      "TEMP": "387",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "96"
+    },
+    {
+      "elapsed_seconds": 520.16,
+      "phase": "mixed",
+      "TEMP": "385",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "96"
+    },
+    {
+      "elapsed_seconds": 530.9,
+      "phase": "mixed",
+      "TEMP": "385",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "96"
+    },
+    {
+      "elapsed_seconds": 541.73,
+      "phase": "mixed",
+      "TEMP": "382",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "96"
+    },
+    {
+      "elapsed_seconds": 552.49,
+      "phase": "mixed",
+      "TEMP": "385",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "96"
+    },
+    {
+      "elapsed_seconds": 563.22,
+      "phase": "mixed",
+      "TEMP": "385",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "96"
+    },
+    {
+      "elapsed_seconds": 574.0,
+      "phase": "mixed",
+      "TEMP": "387",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "96"
+    },
+    {
+      "elapsed_seconds": 584.81,
+      "phase": "mixed",
+      "TEMP": "382",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "96"
+    },
+    {
+      "elapsed_seconds": 595.53,
+      "phase": "mixed",
+      "TEMP": "385",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "96"
+    },
+    {
+      "elapsed_seconds": 605.88,
+      "phase": "mixed",
+      "TEMP": "385",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "96"
+    },
+    {
+      "elapsed_seconds": 616.27,
+      "phase": "mixed",
+      "TEMP": "385",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "307200",
+      "THERMAL": "running",
+      "CAPACITY": "96"
+    }
+  ],
+  "units": {
+    "TEMP": "battery temperature in tenths of a degree Celsius",
+    "FREQ0": "kHz",
+    "FREQ2": "kHz",
+    "clock_under_load": "rate and measure in Hz"
+  },
+  "log_review": "False-positive Oops substring within ramoops registration at 1.214007 s. Added word boundary and rechecked complete live/final dmesg. Computation phases and boot continuity already passed. Original result preserved."
+}

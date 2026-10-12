@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+*.img
+*.lz4
+Image
+Image.*
+/private/
+/runs/
+/build/
+/dist/
+*.zip

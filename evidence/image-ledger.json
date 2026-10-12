@@ -1,0 +1,52 @@
+[
+  {
+    "file_label": "boot_a-original.img",
+    "sha256": "26d5c3e57bfcdd3b45f9d66e4ec7224cfca5ac43a003ff433f19288bd63bcf4c",
+    "bytes": 33554432
+  },
+  {
+    "file_label": "boot_a-test-2cpu.img",
+    "sha256": "7c6f9d632f45f5b5000e541cef5ae17b48b496e6d9135e5058578da0748cd8e8",
+    "bytes": 33554432
+  },
+  {
+    "file_label": "boot-2cpu-perf902.img",
+    "sha256": "e3aaa082608dd0904de5ffb44a0805f0cfa0565ce66ffbdcbd38f8b4c08fee1e",
+    "bytes": 33554432
+  },
+  {
+    "file_label": "boot-3cpu-perf902.img",
+    "sha256": "95596271713c27d0d4217d04de6e31e527a2141dc4f103f59c65e0dcf132c395",
+    "bytes": 33554432
+  },
+  {
+    "file_label": "boot-2cpu-perf902-altpll.img",
+    "sha256": "3ca726ba0852f88b5af6faf03153ead916f9612faeaf702049e46f73270543f9",
+    "bytes": 33554432
+  },
+  {
+    "file_label": "boot-3cpu-perf902-altpll.img",
+    "sha256": "55a3af5573cc9f0b070311b9931ffb5c871928544aa25f92486e38b2dfca2702",
+    "bytes": 33554432
+  },
+  {
+    "file_label": "boot-4cpu-perf902-altpll.img",
+    "sha256": "8ebc08604cdb5e5a2dc0fda8f48396574f2cf019c281104fadd7ca24422e461b",
+    "bytes": 33554432
+  },
+  {
+    "file_label": "boot-2cpu-perf902-altpll-div1.img",
+    "sha256": "a580e33c2931f4c4da7b1435e3606441f157f266c8386f3a84c31e1147ab0856",
+    "bytes": 33554432
+  },
+  {
+    "file_label": "boot-4cpu-perf902-altpll-div1.img",
+    "sha256": "96373555d51046353bd896686c1d79fc4a88930e294ae27be8659669c7e18f32",
+    "bytes": 33554432
+  },
+  {
+    "file_label": "boot-4cpu-stable1593-perf902-altpll-div1.img",
+    "sha256": "4635c2c76c37ff34259bfdc15d7e430c95cbc24cfd85cd864b877f0a21d2ccee",
+    "bytes": 33554432
+  }
+]

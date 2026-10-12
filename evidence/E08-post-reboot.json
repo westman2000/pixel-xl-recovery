@@ -1,0 +1,181 @@
+{
+  "label": "E08-post-reboot",
+  "data_sha256": "054f0160fed7dd003f4520bd50f235b2beb79868413e19e106e85dccb86a9d8a",
+  "boot_sha256": "4635c2c76c37ff34259bfdc15d7e430c95cbc24cfd85cd864b877f0a21d2ccee",
+  "phases": [
+    {
+      "phase": "hash",
+      "elapsed_seconds": 66.41,
+      "iterations_by_core": [
+        146,
+        146,
+        93,
+        94
+      ],
+      "correctness_checks": 958
+    },
+    {
+      "phase": "mixed",
+      "elapsed_seconds": 65.44,
+      "iterations_by_core": [
+        23,
+        24,
+        17,
+        17
+      ],
+      "correctness_checks": 243
+    }
+  ],
+  "passed": true,
+  "clock_under_load": "pwrcl\n1593600000\n1593601024\nperfcl\n902400000\n902401600",
+  "total_elapsed_seconds": 132.44,
+  "boot_continuity": true,
+  "telemetry": [
+    {
+      "elapsed_seconds": 0.76,
+      "phase": "hash",
+      "TEMP": "360",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "97"
+    },
+    {
+      "elapsed_seconds": 13.16,
+      "phase": "hash",
+      "TEMP": "362",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "97"
+    },
+    {
+      "elapsed_seconds": 23.87,
+      "phase": "hash",
+      "TEMP": "360",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "98"
+    },
+    {
+      "elapsed_seconds": 34.59,
+      "phase": "hash",
+      "TEMP": "360",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "98"
+    },
+    {
+      "elapsed_seconds": 45.32,
+      "phase": "hash",
+      "TEMP": "360",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "98"
+    },
+    {
+      "elapsed_seconds": 56.03,
+      "phase": "hash",
+      "TEMP": "362",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "98"
+    },
+    {
+      "elapsed_seconds": 66.41,
+      "phase": "hash",
+      "TEMP": "362",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "307200",
+      "THERMAL": "running",
+      "CAPACITY": "98"
+    },
+    {
+      "elapsed_seconds": 67.29,
+      "phase": "mixed",
+      "TEMP": "362",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "98"
+    },
+    {
+      "elapsed_seconds": 78.22,
+      "phase": "mixed",
+      "TEMP": "365",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "98"
+    },
+    {
+      "elapsed_seconds": 89.02,
+      "phase": "mixed",
+      "TEMP": "362",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "98"
+    },
+    {
+      "elapsed_seconds": 99.82,
+      "phase": "mixed",
+      "TEMP": "362",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "98"
+    },
+    {
+      "elapsed_seconds": 110.63,
+      "phase": "mixed",
+      "TEMP": "367",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "98"
+    },
+    {
+      "elapsed_seconds": 121.43,
+      "phase": "mixed",
+      "TEMP": "370",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "902400",
+      "THERMAL": "running",
+      "CAPACITY": "98"
+    },
+    {
+      "elapsed_seconds": 131.85,
+      "phase": "mixed",
+      "TEMP": "367",
+      "ONLINE": "0-3",
+      "FREQ0": "1593600",
+      "FREQ2": "307200",
+      "THERMAL": "running",
+      "CAPACITY": "98"
+    }
+  ],
+  "units": {
+    "TEMP": "battery temperature in tenths of a degree Celsius",
+    "FREQ0": "kHz",
+    "FREQ2": "kHz",
+    "clock_under_load": "rate and measure in Hz"
+  }
+}

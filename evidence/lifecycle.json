@@ -1,0 +1,106 @@
+{
+  "passed": true,
+  "scope": "Screen off/wake and normal reboots; not proof of deep suspend. Original boot has lpm_levels.sleep_disabled=1.",
+  "screen_cycles": [
+    {
+      "cycle": 1,
+      "off": "mWakefulness=Dozing",
+      "on": "mWakefulness=Awake",
+      "uptime": "735.24 337.05",
+      "temp": "370"
+    },
+    {
+      "cycle": 2,
+      "off": "mWakefulness=Dozing",
+      "on": "mWakefulness=Awake",
+      "uptime": "742.31 360.80",
+      "temp": "367"
+    },
+    {
+      "cycle": 3,
+      "off": "mWakefulness=Dozing",
+      "on": "mWakefulness=Awake",
+      "uptime": "749.28 383.91",
+      "temp": "365"
+    },
+    {
+      "cycle": 4,
+      "off": "mWakefulness=Dozing",
+      "on": "mWakefulness=Awake",
+      "uptime": "756.40 407.61",
+      "temp": "365"
+    },
+    {
+      "cycle": 5,
+      "off": "mWakefulness=Dozing",
+      "on": "mWakefulness=Awake",
+      "uptime": "763.37 430.34",
+      "temp": "360"
+    },
+    {
+      "cycle": 6,
+      "off": "mWakefulness=Dozing",
+      "on": "mWakefulness=Awake",
+      "uptime": "770.45 453.72",
+      "temp": "360"
+    },
+    {
+      "cycle": 7,
+      "off": "mWakefulness=Dozing",
+      "on": "mWakefulness=Awake",
+      "uptime": "777.51 477.28",
+      "temp": "360"
+    },
+    {
+      "cycle": 8,
+      "off": "mWakefulness=Dozing",
+      "on": "mWakefulness=Awake",
+      "uptime": "784.58 500.88",
+      "temp": "357"
+    },
+    {
+      "cycle": 9,
+      "off": "mWakefulness=Dozing",
+      "on": "mWakefulness=Awake",
+      "uptime": "791.60 524.01",
+      "temp": "355"
+    },
+    {
+      "cycle": 10,
+      "off": "mWakefulness=Dozing",
+      "on": "mWakefulness=Awake",
+      "uptime": "798.68 547.57",
+      "temp": "355"
+    }
+  ],
+  "reboots": [
+    {
+      "index": 1,
+      "online": "0-3",
+      "pll_lock_lines": [
+        "[    1.311665] variable_rate_pll_clk_enable_hwfsm: PLL perfcl_pll didn't lock after enabling it!"
+      ],
+      "temperature_tenths_c": "355",
+      "thermal_service": "running"
+    },
+    {
+      "index": 2,
+      "online": "0-3",
+      "pll_lock_lines": [
+        "[    1.308575] variable_rate_pll_clk_enable_hwfsm: PLL perfcl_pll didn't lock after enabling it!"
+      ],
+      "temperature_tenths_c": "355",
+      "thermal_service": "running"
+    },
+    {
+      "index": 3,
+      "online": "0-3",
+      "pll_lock_lines": [
+        "[    1.310206] variable_rate_pll_clk_enable_hwfsm: PLL perfcl_pll didn't lock after enabling it!"
+      ],
+      "temperature_tenths_c": "357",
+      "thermal_service": "running"
+    }
+  ],
+  "distinct_boot_id_count": 3
+}

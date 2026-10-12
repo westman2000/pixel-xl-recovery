@@ -1,0 +1,17 @@
+Original failed boot
+Matching lines in captured buffer: 100
+[    1.328407] variable_rate_pll_clk_enable_hwfsm: PLL perfcl_pll didn't lock after enabling it!
+[    1.620665] variable_rate_pll_clk_enable_hwfsm: PLL perfcl_pll didn't lock after enabling it!
+...
+[   49.990444] variable_rate_pll_clk_enable_hwfsm: PLL perfcl_pll didn't lock after enabling it!
+
+Reduced frequency with original clock path
+Matching lines in captured buffer: 58
+[    0.827154] variable_rate_pll_clk_enable_hwfsm: PLL perfcl_pll didn't lock after enabling it!
+[    1.160679] variable_rate_pll_clk_enable_hwfsm: PLL perfcl_pll didn't lock after enabling it!
+...
+[   57.530462] variable_rate_pll_clk_enable_hwfsm: PLL perfcl_pll didn't lock after enabling it!
+
+Final configuration after third normal reboot
+Matching lines in captured buffer: 1
+[    1.310206] variable_rate_pll_clk_enable_hwfsm: PLL perfcl_pll didn't lock after enabling it!
