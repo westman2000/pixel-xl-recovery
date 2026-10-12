@@ -31,5 +31,14 @@
   "publication_repository": "https://github.com/westman2000/pixel-xl-recovery",
   "public_ci_private_image_test": "Skipped: the private original boot image is not distributed.",
   "publication_site": "https://westman2000.github.io/pixel-xl-recovery/",
-  "online_and_offline_html_structural_checks_passed": true
+  "online_and_offline_html_structural_checks_passed": true,
+  "linux_host_ci": {
+    "python_versions": [
+      "3.9",
+      "3.12"
+    ],
+    "result": "passed",
+    "private_image_test": "skipped",
+    "reference_run": "https://github.com/westman2000/pixel-xl-recovery/actions/runs/38262113857"
+  }
 }

@@ -4,7 +4,7 @@
 
 The host tools use Python 3.9+ and its standard library. Invoke them with `python3` from the project root. The device tools additionally need Google's `adb` or `fastboot` on PATH; each accepts an explicit executable path. The stable image builder needs the LZ4 command-line utility. Exact image reconstruction was verified with LZ4 1.10.0 on macOS.
 
-Linux is an intended host target, but was not exercised in this packaging session. Windows-specific transport, quoting, and terminal behavior have not been validated. The planner prints POSIX shell commands; do not assume that its quoting is appropriate for PowerShell or cmd.exe.
+The public host suite passed on Ubuntu with Python 3.9 and 3.12 in [GitHub Actions](https://github.com/westman2000/pixel-xl-recovery/actions/workflows/host-checks.yml). Those Linux jobs use simulated device transport and skip the private-image test; they do not validate a real Linux-to-phone session. Windows-specific transport, quoting, and terminal behavior have not been validated. The planner prints POSIX shell commands; do not assume that its quoting is appropriate for PowerShell or cmd.exe.
 
 All device commands require an explicit `--serial`. The collector and soak tool require Android/recovery to report `ro.product.device=marlin`. ADB root must already be available for boot backup and soak. The tools do not enable root, grant authorization, unlock a bootloader, change slots, or choose a device implicitly.
 
